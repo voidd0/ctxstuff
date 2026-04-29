@@ -1,6 +1,6 @@
 {
   "name": "@v0idd0/ctxstuff",
-  "version": "3.0.0",
+  "version": "3.0.2",
   "description": "Pack codebases into LLM-ready context. 60+ models with 2026-04-22 pricing — GPT-5.4, Claude Opus 4.7, Gemini 3.1 Pro, Llama 4 Scout (10M ctx), Grok 4.1 Fast, Mistral Large 3, DeepSeek V3.2, Cohere Command A/R7B. Optimize, split, watch, cost-estimate. Runs locally, no API keys, no telemetry. Free forever from vøiddo.",
   "main": "index.js",
   "bin": {
@@ -63,11 +63,19 @@
   "files": [
     "bin/",
     "src/",
-    "index.js",
-    "README.md",
-    "LICENSE"
+    "LICENSE",
+    "README.md"
   ],
   "publishConfig": {
     "access": "public"
+  },
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "funding": {
+    "type": "individual",
+    "url": "https://voiddo.com/contact/"
   }
 }
