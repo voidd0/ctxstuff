@@ -1,7 +1,7 @@
 {
   "name": "@v0idd0/ctxstuff",
-  "version": "3.0.2",
-  "description": "Pack codebases into LLM-ready context. 60+ models with 2026-04-22 pricing — GPT-5.4, Claude Opus 4.7, Gemini 3.1 Pro, Llama 4 Scout (10M ctx), Grok 4.1 Fast, Mistral Large 3, DeepSeek V3.2, Cohere Command A/R7B. Optimize, split, watch, cost-estimate. Runs locally, no API keys, no telemetry. Free forever from vøiddo.",
+  "version": "3.0.4",
+  "description": "Pack a code directory into one context file for LLM prompts. Count tokens, compare models, split, optimize to a token limit, estimate cost, watch for changes. Model prices are a 2026-04 snapshot.",
   "main": "index.js",
   "bin": {
     "ctxstuff": "./bin/ctxstuff.js"
@@ -13,34 +13,20 @@
   "keywords": [
     "llm",
     "llm-context",
-    "llm-packing",
     "context-packing",
-    "ai",
-    "chatgpt",
-    "claude",
-    "gemini",
-    "gpt",
-    "gpt-5",
-    "claude-4",
-    "llama-4",
+    "codebase-packer",
+    "repo-to-llm",
     "tokens",
     "token-counting",
     "cost-estimator",
-    "tiktoken",
-    "codebase-packer",
-    "repo-to-llm",
     "cli",
     "developer-tools",
-    "packer",
-    "codebase",
-    "anthropic",
     "openai",
-    "free",
-    "voiddo"
+    "anthropic"
   ],
   "author": "vøiddo <support@voiddo.com> (https://voiddo.com)",
   "license": "MIT",
-  "homepage": "https://voiddo.com/tools/ctxstuff/",
+  "homepage": "https://tools.voiddo.com/ctxstuff/",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/voidd0/ctxstuff.git"
@@ -63,17 +49,13 @@
   "files": [
     "bin/",
     "src/",
-    "LICENSE",
-    "README.md"
+    "index.js",
+    "README.md",
+    "LICENSE"
   ],
   "publishConfig": {
     "access": "public"
   },
-  "os": [
-    "darwin",
-    "linux",
-    "win32"
-  ],
   "funding": {
     "type": "individual",
     "url": "https://voiddo.com/contact/"

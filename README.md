@@ -1,20 +1,18 @@
 # ctxstuff
 
 > **Pack codebases into LLM-ready context. Cost-estimate before you send.**
-> A gift to the terminal from [**vøiddo**](https://voiddo.com).
-
 [![npm](https://img.shields.io/npm/v/@v0idd0/ctxstuff?color=%2322c55e&label=%40v0idd0%2Fctxstuff)](https://www.npmjs.com/package/@v0idd0/ctxstuff)
 [![downloads](https://img.shields.io/npm/dm/@v0idd0/ctxstuff?color=%2322c55e)](https://www.npmjs.com/package/@v0idd0/ctxstuff)
 [![license](https://img.shields.io/npm/l/@v0idd0/ctxstuff?color=%2322c55e)](./LICENSE)
 [![node](https://img.shields.io/node/v/@v0idd0/ctxstuff?color=%2322c55e)](./package.json)
 
-**[Homepage](https://voiddo.com/tools/ctxstuff/)** · **[GitHub](https://github.com/voidd0/ctxstuff)** · **[npm](https://www.npmjs.com/package/@v0idd0/ctxstuff)** · **[All tools](https://voiddo.com/tools/)** · **[Contact](mailto:support@voiddo.com)**
+**[Homepage](https://tools.voiddo.com/ctxstuff/?ref=ctxstuff-readme)** · **[GitHub](https://github.com/voidd0/ctxstuff)** · **[npm](https://www.npmjs.com/package/@v0idd0/ctxstuff)** · **[All tools](https://tools.voiddo.com/?ref=ctxstuff-catalog-readme)** · **[Contact](mailto:support@voiddo.com)**
 
 ---
 
 ## Why ctxstuff
 
-You have a directory of source code and a frontier LLM with a 200K–10M-token context window. You need to turn one into prompt material for the other, in a format that the model actually reads well, while knowing **how much this prompt is going to cost** before you pay for it.
+You have a directory of source code and a frontier LLM with a 200K, 10M-token context window. You need to turn one into prompt material for the other, in a format that the model actually reads well, while knowing **how much this prompt is going to cost** before you pay for it.
 
 Every other tool does half of that, paywalls the other half, and hallucinates pricing numbers that haven't been correct since the day they shipped.
 
@@ -96,20 +94,20 @@ ctxstuff pack . --ext ts,tsx,md --ignore dist,coverage
 | **Meta** | `llama-4-scout` (**10M ctx!**) | `llama-4-maverick`, `llama-3.3-70b` |
 | **Mistral** | `mistral-large-3` ($2/$6), `magistral-medium` (reasoning) | `mistral-medium-3`, `mistral-small-4`, `magistral-small-1.2`, `codestral` |
 | **xAI** | `grok-4` ($3/$15) | `grok-4.1-fast` (2M ctx, $0.20/$0.50) |
-| **DeepSeek** | `deepseek-v3.2` ($0.28/$0.42), `deepseek-r2` (reasoning) | — |
+| **DeepSeek** | `deepseek-v3.2` ($0.28/$0.42), `deepseek-r2` (reasoning) | n/a |
 | **Alibaba** | `qwen3-max` ($0.78/$3.90, 262K ctx) | `qwen3.5-plus` (1M ctx) |
-| **Cohere** | `command-a` ($2.50/$10) | `command-r-plus`, `command-r`, `command-r7b` (**$0.0375**/MTok — cheapest premium) |
+| **Cohere** | `command-a` ($2.50/$10) | `command-r-plus`, `command-r`, `command-r7b` (**$0.0375**/MTok, cheapest premium) |
 
 **Short aliases** (pass to `--model`): `gpt`, `claude`, `opus`, `sonnet`, `haiku`, `gemini`, `gemini-pro`, `llama`, `scout`, `maverick`, `mistral`, `magistral`, `grok`, `deepseek`, `qwen`, `command`, `reasoning`. Every old pre-3.0 key (`claude-4-opus`, `mistral-large-2`, etc.) resolves to its 2026-04 equivalent.
 
-Pricing drifts monthly — run `ctxstuff cost . --compare` to see the numbers the installed version knows. Bump the package when you want fresh data.
+Pricing drifts monthly: run `ctxstuff cost . --compare` to see the numbers the installed version knows. Bump the package when you want fresh data.
 
 ## Output formats
 
-- **`markdown`** (default) — headers per file, fenced code blocks with language hints. Best for Claude, Gemini, GPT-5.
-- **`xml`** — Anthropic's preferred framing (`<file path="..."> ... </file>`). Best for long Claude runs with tool use.
-- **`plain`** — just the raw text, minimal dividers. Best for pipelines that re-process.
-- **`json`** — structured output for programmatic consumers: `{ files: [{ path, lang, content, tokens }], tokens, model }`.
+- **`markdown`** (default), headers per file, fenced code blocks with language hints. Best for Claude, Gemini, GPT-5.
+- **`xml`**: Anthropic's preferred framing (`<file path="..."> ... </file>`). Best for long Claude runs with tool use.
+- **`plain`**: just the raw text, minimal dividers. Best for pipelines that re-process.
+- **`json`**: structured output for programmatic consumers: `{ files: [{ path, lang, content, tokens }], tokens, model }`.
 
 ## Library use
 
@@ -124,28 +122,14 @@ const result = await pack('./src', {
 console.log(result.tokens, result.content.length);
 ```
 
-## Why free forever
-
-We are [**vøiddo**](https://voiddo.com) — a studio building small, sharp tools and a few serious products ([scrb](https://scrb.voiddo.com), [rankd](https://rankd.voiddo.com), [gridlock](https://gl.voiddo.com), and more). The serious products pay for themselves. The tools are gifts.
-
-We write ctxstuff because _we_ need to pack our own codebases into LLM context all day, and leaving it free means we don't have to build a billing flow for a CLI utility.
-
-## From the same studio
-
-- **[@v0idd0/tokcount](https://www.npmjs.com/package/@v0idd0/tokcount)** — count LLM tokens + cost across 60+ models
-- **[@v0idd0/jsonyo](https://www.npmjs.com/package/@v0idd0/jsonyo)** — JSON swiss army knife, 18 commands
-- **[@v0idd0/promptdiff](https://www.npmjs.com/package/@v0idd0/promptdiff)** — diff LLM prompts with semantic awareness
-- **[@v0idd0/envguard](https://www.npmjs.com/package/@v0idd0/envguard)** — stop shipping `.env` drift to staging
-- **[View all tools →](https://voiddo.com/tools/)**
-
 ## Contributing
 
 Model gone? Price stale? New provider? New output format? Open an issue at [github.com/voidd0/ctxstuff/issues](https://github.com/voidd0/ctxstuff/issues) or drop a line to [support@voiddo.com](mailto:support@voiddo.com).
 
 ## License
 
-MIT — see [LICENSE](./LICENSE).
+MIT: see [LICENSE](./LICENSE).
 
 ---
 
-Built by [vøiddo](https://voiddo.com/) — a small studio shipping AI-flavoured products, free dev tools, Chrome extensions and weird browser games.
+Maintained by v0idd0.
