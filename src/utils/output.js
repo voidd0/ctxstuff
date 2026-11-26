@@ -5,6 +5,8 @@
 
 const chalk = require('chalk');
 
+if (process.env.NO_COLOR) chalk.level = 0;
+
 // Color helpers
 const colors = {
   success: chalk.green,
@@ -13,7 +15,6 @@ const colors = {
   info: chalk.cyan,
   dim: chalk.dim,
   bold: chalk.bold,
-  pro: chalk.magenta.bold,
   price: chalk.green.bold,
   header: chalk.white.bold,
   accent: chalk.cyan,
@@ -37,7 +38,7 @@ function error(msg) {
  * Print warning message
  */
 function warning(msg) {
-  console.log(colors.warning('⚠ ') + msg);
+  console.log(colors.warning('! ') + msg);
 }
 
 /**
@@ -124,21 +125,6 @@ function list(items, bullet = '•') {
   items.forEach(item => console.log(`  ${bullet} ${item}`));
 }
 
-/**
- * Print PRO feature badge
- */
-function proBadge() {
-  return colors.pro('[PRO]');
-}
-
-/**
- * Print version string
- */
-function version(v, tier) {
-  const tierStr = tier === 'pro' ? colors.pro('PRO') : colors.dim('FREE');
-  return `ctxstuff v${v} ${tierStr}`;
-}
-
 module.exports = {
   colors,
   success,
@@ -153,6 +139,4 @@ module.exports = {
   formatMoney,
   table,
   list,
-  proBadge,
-  version,
 };

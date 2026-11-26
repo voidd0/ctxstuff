@@ -1,5 +1,5 @@
 /**
- * Optimize command (PRO only)
+ * Optimize command
  * @module commands/optimize
  *
  * Optimizes context to fit within token limits
@@ -11,11 +11,8 @@ const { packDirectory } = require('../core/packer');
 const { optimizeContext, getSuggestions } = require('../core/optimizer');
 const { countFilesTokens, getModelInfo } = require('../core/tokenizer');
 const { format } = require('../core/formatter');
-const { isPro } = require('../license/checker');
-const { canOperate, incrementOps } = require('../license/limits');
-const { showProFeatureUpsell, maybeShowProTip } = require('../utils/upsell');
 const { colors, success, error, warning, header, separator, formatBytes, formatNumber } = require('../utils/output');
-const { DEFAULT_MODEL } = require('../license/constants');
+const { DEFAULT_MODEL } = require('../models');
 
 /**
  * Execute optimize command
@@ -23,31 +20,10 @@ const { DEFAULT_MODEL } = require('../license/constants');
  * @param {Object} options - Command options
  */
 async function execute(directory, options = {}) {
-  // Check PRO status
-  if (!isPro()) {
-    showProFeatureUpsell('optimize', `
-Context optimization automatically:
-  • Removes comments and docstrings
-  • Compresses whitespace
-  • Truncates low-priority files
-  • Fits context to any token limit
-
-Perfect for large codebases that exceed context limits.
-    `);
-    process.exit(1);
-  }
-
   const dir = path.resolve(directory || '.');
 
   if (!fs.existsSync(dir)) {
     error(`Directory not found: ${dir}`);
-    process.exit(1);
-  }
-
-  // Check rate limit
-  const opCheck = canOperate();
-  if (!opCheck.allowed) {
-    error(opCheck.reason);
     process.exit(1);
   }
 
@@ -73,7 +49,7 @@ Perfect for large codebases that exceed context limits.
   // Get initial stats
   const initialTokens = countFilesTokens(packed.files, model);
 
-  header(`🔧 Optimizing: ${packed.directory}`);
+  header(`Optimizing: ${packed.directory}`);
   console.log('');
   console.log(`  ${colors.dim('Target:')}    ${formatNumber(targetTokens)} tokens (${model})`);
   console.log(`  ${colors.dim('Initial:')}   ${formatNumber(initialTokens.totalTokens)} tokens`);
@@ -126,9 +102,6 @@ Perfect for large codebases that exceed context limits.
     console.log(`  ${colors.dim('Strategies:')} ${Array.from(strategiesUsed).join(', ')}`);
   }
 
-  // Increment operation count
-  incrementOps();
-
   // Output
   if (options.output) {
     const outputFormat = options.format || 'markdown';
@@ -142,9 +115,6 @@ Perfect for large codebases that exceed context limits.
     console.log('');
     console.log(colors.dim('Use --output <file> to save optimized context'));
   }
-
-  // Show tip
-  maybeShowProTip('optimize');
 }
 
 module.exports = { execute };

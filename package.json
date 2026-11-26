@@ -1,7 +1,7 @@
 {
   "name": "@v0idd0/ctxstuff",
-  "version": "3.0.4",
-  "description": "Pack a code directory into one context file for LLM prompts. Count tokens, compare models, split, optimize to a token limit, estimate cost, watch for changes. Model prices are a 2026-04 snapshot.",
+  "version": "3.0.5",
+  "description": "Pack a code directory into one context file for LLM prompts. Count tokens, compare models, split or optimize to a token limit, and estimate cost from a price table dated 2026-11-26.",
   "main": "index.js",
   "bin": {
     "ctxstuff": "./bin/ctxstuff.js"
@@ -26,17 +26,16 @@
   ],
   "author": "vøiddo <support@voiddo.com> (https://voiddo.com)",
   "license": "MIT",
-  "homepage": "https://tools.voiddo.com/ctxstuff/",
+  "homepage": "https://voiddo.com/packages/#ctxstuff",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/voidd0/ctxstuff.git"
   },
   "bugs": {
-    "url": "https://github.com/voidd0/ctxstuff/issues",
-    "email": "support@voiddo.com"
+    "url": "https://github.com/voidd0/ctxstuff/issues"
   },
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=18"
   },
   "dependencies": {
     "chalk": "^4.1.2",
@@ -46,18 +45,14 @@
     "tiktoken": "^1.0.12",
     "chokidar": "^3.5.3"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "files": [
     "bin/",
     "src/",
     "index.js",
     "README.md",
     "LICENSE"
-  ],
-  "publishConfig": {
-    "access": "public"
-  },
-  "funding": {
-    "type": "individual",
-    "url": "https://voiddo.com/contact/"
-  }
+  ]
 }

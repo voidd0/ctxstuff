@@ -1,5 +1,5 @@
 /**
- * Split command (PRO only)
+ * Split command
  * @module commands/split
  *
  * Splits large codebases into manageable chunks
@@ -10,11 +10,8 @@ const fs = require('fs');
 const { packDirectory } = require('../core/packer');
 const { splitContext, suggestSplit, SPLIT_STRATEGIES } = require('../core/splitter');
 const { format } = require('../core/formatter');
-const { isPro } = require('../license/checker');
-const { canOperate, incrementOps } = require('../license/limits');
-const { showProFeatureUpsell, maybeShowProTip } = require('../utils/upsell');
 const { colors, success, error, header, separator, formatBytes, formatNumber, table } = require('../utils/output');
-const { DEFAULT_MODEL } = require('../license/constants');
+const { DEFAULT_MODEL } = require('../models');
 
 /**
  * Execute split command
@@ -22,31 +19,10 @@ const { DEFAULT_MODEL } = require('../license/constants');
  * @param {Object} options - Command options
  */
 async function execute(directory, options = {}) {
-  // Check PRO status
-  if (!isPro()) {
-    showProFeatureUpsell('split', `
-Context splitting automatically:
-  • Divides large codebases into chunks
-  • Respects model context limits
-  • Groups by directory, type, or tokens
-  • Optional overlap for continuity
-
-Perfect for codebases that don't fit in a single context window.
-    `);
-    process.exit(1);
-  }
-
   const dir = path.resolve(directory || '.');
 
   if (!fs.existsSync(dir)) {
     error(`Directory not found: ${dir}`);
-    process.exit(1);
-  }
-
-  // Check rate limit
-  const opCheck = canOperate();
-  if (!opCheck.allowed) {
-    error(opCheck.reason);
     process.exit(1);
   }
 
@@ -65,11 +41,10 @@ Perfect for codebases that don't fit in a single context window.
   if (options.suggest) {
     const suggestion = suggestSplit(packed, model);
     printSuggestion(suggestion, packed, model);
-    incrementOps();
     return;
   }
 
-  header(`✂️ Splitting: ${packed.directory}`);
+  header(`Splitting: ${packed.directory}`);
   console.log('');
   console.log(`  ${colors.dim('Strategy:')}  ${strategy}`);
   console.log(`  ${colors.dim('Model:')}     ${model}`);
@@ -109,9 +84,6 @@ Perfect for codebases that don't fit in a single context window.
   console.log(`  ${colors.dim('Avg tokens:')}  ${formatNumber(result.stats.avgTokensPerChunk)}`);
   console.log(`  ${colors.dim('Max tokens:')}  ${formatNumber(result.stats.maxTokensInChunk)}`);
   console.log(`  ${colors.dim('Min tokens:')}  ${formatNumber(result.stats.minTokensInChunk)}`);
-
-  // Increment operation count
-  incrementOps();
 
   // Output chunks
   if (options.output) {
@@ -159,16 +131,13 @@ Perfect for codebases that don't fit in a single context window.
       console.log('');
     }
   }
-
-  // Show tip
-  maybeShowProTip('split');
 }
 
 /**
  * Print split suggestion
  */
 function printSuggestion(suggestion, packed, model) {
-  header(`📊 Split Analysis: ${packed.directory}`);
+  header(`Split Analysis: ${packed.directory}`);
   console.log('');
 
   console.log(`  ${colors.dim('Files:')}     ${formatNumber(packed.files.length)}`);
@@ -182,7 +151,7 @@ function printSuggestion(suggestion, packed, model) {
   console.log('');
 
   if (suggestion.needsSplit) {
-    console.log(colors.warning(`⚠ ${suggestion.recommendation}`));
+    console.log(colors.warning(`! ${suggestion.recommendation}`));
     console.log('');
     console.log(colors.bold('Available strategies:'));
     suggestion.strategies.forEach(s => {

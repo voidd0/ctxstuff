@@ -1,0 +1,1021 @@
+{
+  "checked": "2026-11-26",
+  "note": "Prices are USD per 1,000,000 tokens as stated on the provider pages on the date in \"checked\". Entries with an older \"checked\" date were not re-read: the provider page did not list them or could not be read.",
+  "sources": {
+    "anthropic": "https://platform.claude.com/docs/en/about-claude/pricing",
+    "openai": "https://developers.openai.com/api/docs/pricing",
+    "google": "https://aistudio.google.com/docs/pricing",
+    "xai": "https://docs.x.ai/docs/models",
+    "deepseek": "https://api-docs.deepseek.com/quick_start/pricing",
+    "alibaba": "https://www.alibabacloud.com/help/en/model-studio/model-pricing",
+    "mistral": "https://docs.mistral.ai/inference/pricing",
+    "cohere": "https://cohere.com/pricing",
+    "amazon": "https://aws.amazon.com/bedrock/pricing/",
+    "meta": "https://dev.meta.ai/"
+  },
+  "aliases": {
+    "gpt": "gpt-6.2-sol",
+    "openai": "gpt-6.2-sol",
+    "chatgpt": "gpt-6.2-sol",
+    "reasoning": "o3",
+    "claude": "claude-sonnet-5-5",
+    "sonnet": "claude-sonnet-5-5",
+    "opus": "claude-opus-5-5",
+    "haiku": "claude-haiku-5-5",
+    "fable": "claude-fable-5-2",
+    "anthropic": "claude-sonnet-5-5",
+    "gemini": "gemini-3.5-flash-lite",
+    "gemini-pro": "gemini-4-neon",
+    "gemini-flash": "gemini-3.8-flash",
+    "gemini-lite": "gemini-3.5-flash-lite",
+    "google": "gemini-3.5-flash-lite",
+    "grok": "grok-4.7",
+    "xai": "grok-4.7",
+    "deepseek": "deepseek-flash",
+    "qwen": "qwen4-max",
+    "llama": "llama-4-maverick",
+    "meta": "llama-4-maverick",
+    "scout": "llama-4-scout",
+    "maverick": "llama-4-maverick",
+    "mistral": "mistral-large-3",
+    "magistral": "magistral-medium",
+    "cohere": "command-a",
+    "command": "command-a",
+    "nova": "nova-pro",
+    "amazon": "nova-pro",
+    "aws": "nova-pro"
+  },
+  "models": {
+    "claude-fable-5-2": {
+      "provider": "anthropic",
+      "input": 8,
+      "output": 40,
+      "context": 1000000,
+      "checked": "2026-11-26",
+      "tags": [
+        "flagship",
+        "long-context"
+      ]
+    },
+    "claude-fable-5-1": {
+      "provider": "anthropic",
+      "input": 10,
+      "output": 50,
+      "context": 1000000,
+      "checked": "2026-11-26",
+      "tags": [
+        "flagship",
+        "long-context"
+      ]
+    },
+    "claude-fable-5": {
+      "provider": "anthropic",
+      "input": 10,
+      "output": 50,
+      "context": 1000000,
+      "checked": "2026-11-26",
+      "tags": [
+        "flagship",
+        "long-context"
+      ]
+    },
+    "claude-opus-5-5": {
+      "provider": "anthropic",
+      "input": 4,
+      "output": 20,
+      "context": 1000000,
+      "checked": "2026-11-26",
+      "tags": [
+        "flagship",
+        "long-context"
+      ]
+    },
+    "claude-opus-5": {
+      "provider": "anthropic",
+      "input": 5,
+      "output": 25,
+      "context": 1000000,
+      "checked": "2026-11-26",
+      "tags": [
+        "long-context"
+      ]
+    },
+    "claude-opus-4-8": {
+      "provider": "anthropic",
+      "input": 5,
+      "output": 25,
+      "context": 1000000,
+      "checked": "2026-11-26",
+      "tags": [
+        "legacy",
+        "long-context"
+      ]
+    },
+    "claude-opus-4-7": {
+      "provider": "anthropic",
+      "input": 5,
+      "output": 25,
+      "context": 1000000,
+      "checked": "2026-11-26",
+      "tags": [
+        "legacy",
+        "long-context"
+      ]
+    },
+    "claude-opus-4-6": {
+      "provider": "anthropic",
+      "input": 5,
+      "output": 25,
+      "context": 1000000,
+      "checked": "2026-11-26",
+      "tags": [
+        "legacy",
+        "long-context"
+      ]
+    },
+    "claude-opus-4-5": {
+      "provider": "anthropic",
+      "input": 5,
+      "output": 25,
+      "context": null,
+      "checked": "2026-11-26",
+      "tags": [
+        "legacy"
+      ]
+    },
+    "claude-sonnet-5-5": {
+      "provider": "anthropic",
+      "input": 2,
+      "output": 10,
+      "context": 1000000,
+      "checked": "2026-11-26",
+      "tags": [
+        "long-context"
+      ]
+    },
+    "claude-sonnet-5": {
+      "provider": "anthropic",
+      "input": 2,
+      "output": 10,
+      "context": 1000000,
+      "checked": "2026-11-26",
+      "tags": [
+        "long-context"
+      ]
+    },
+    "claude-sonnet-4-6": {
+      "provider": "anthropic",
+      "input": 3,
+      "output": 15,
+      "context": 1000000,
+      "checked": "2026-11-26",
+      "tags": [
+        "legacy",
+        "long-context"
+      ]
+    },
+    "claude-sonnet-4-5": {
+      "provider": "anthropic",
+      "input": 3,
+      "output": 15,
+      "context": null,
+      "checked": "2026-11-26",
+      "tags": [
+        "legacy"
+      ]
+    },
+    "claude-haiku-5-5": {
+      "provider": "anthropic",
+      "input": 0.1,
+      "output": 0.5,
+      "context": null,
+      "checked": "2026-11-26",
+      "note": "prompts up to 100,000 tokens; over 100,000 tokens: 0.50 in / 2.50 out",
+      "tags": [
+        "cheap"
+      ]
+    },
+    "claude-haiku-4-5": {
+      "provider": "anthropic",
+      "input": 1,
+      "output": 5,
+      "context": null,
+      "checked": "2026-11-26",
+      "tags": [
+        "legacy"
+      ]
+    },
+    "gpt-6.2-astra": {
+      "provider": "openai",
+      "input": 8,
+      "output": 40,
+      "context": null,
+      "checked": "2026-11-26",
+      "tags": []
+    },
+    "gpt-6.2-sol": {
+      "provider": "openai",
+      "input": 2,
+      "output": 10,
+      "context": null,
+      "checked": "2026-11-26",
+      "tags": []
+    },
+    "gpt-6-astra": {
+      "provider": "openai",
+      "input": 10,
+      "output": 50,
+      "context": null,
+      "checked": "2026-11-26",
+      "tags": []
+    },
+    "gpt-6.1-sol": {
+      "provider": "openai",
+      "input": 2,
+      "output": 10,
+      "context": null,
+      "checked": "2026-11-26",
+      "tags": []
+    },
+    "gpt-6.1-terra": {
+      "provider": "openai",
+      "input": 1,
+      "output": 5,
+      "context": null,
+      "checked": "2026-11-26",
+      "tags": []
+    },
+    "gpt-6-luna": {
+      "provider": "openai",
+      "input": 0.1,
+      "output": 0.5,
+      "context": null,
+      "checked": "2026-11-26",
+      "tags": [
+        "cheap"
+      ]
+    },
+    "gpt-6-sol": {
+      "provider": "openai",
+      "input": 2,
+      "output": 10,
+      "context": null,
+      "checked": "2026-11-26",
+      "tags": []
+    },
+    "gpt-5.6-sol": {
+      "provider": "openai",
+      "input": 4,
+      "output": 20,
+      "context": null,
+      "checked": "2026-11-26",
+      "tags": []
+    },
+    "gpt-5.6-terra": {
+      "provider": "openai",
+      "input": 2,
+      "output": 12,
+      "context": null,
+      "checked": "2026-11-26",
+      "tags": []
+    },
+    "gpt-5.6-luna": {
+      "provider": "openai",
+      "input": 0.2,
+      "output": 1.2,
+      "context": null,
+      "checked": "2026-11-26",
+      "tags": [
+        "cheap"
+      ]
+    },
+    "gpt-5.5": {
+      "provider": "openai",
+      "input": 5,
+      "output": 30,
+      "context": null,
+      "checked": "2026-11-26",
+      "note": "prompts up to 272K tokens",
+      "tags": []
+    },
+    "gpt-5.5-pro": {
+      "provider": "openai",
+      "input": 30,
+      "output": 180,
+      "context": null,
+      "checked": "2026-11-26",
+      "note": "prompts up to 272K tokens",
+      "tags": [
+        "legacy"
+      ]
+    },
+    "gpt-5.4": {
+      "provider": "openai",
+      "input": 2.5,
+      "output": 15,
+      "context": null,
+      "checked": "2026-11-26",
+      "note": "prompts up to 272K tokens",
+      "tags": []
+    },
+    "gpt-5.4-pro": {
+      "provider": "openai",
+      "input": 30,
+      "output": 180,
+      "context": null,
+      "checked": "2026-11-26",
+      "note": "prompts up to 272K tokens",
+      "tags": [
+        "legacy"
+      ]
+    },
+    "gpt-5.4-mini": {
+      "provider": "openai",
+      "input": 0.75,
+      "output": 4.5,
+      "context": null,
+      "checked": "2026-11-26",
+      "tags": []
+    },
+    "gpt-5.4-nano": {
+      "provider": "openai",
+      "input": 0.2,
+      "output": 1.25,
+      "context": null,
+      "checked": "2026-11-26",
+      "tags": [
+        "cheap"
+      ]
+    },
+    "gpt-5.2": {
+      "provider": "openai",
+      "input": 1.75,
+      "output": 14,
+      "context": null,
+      "checked": "2026-11-26",
+      "tags": []
+    },
+    "gpt-5.2-pro": {
+      "provider": "openai",
+      "input": 21,
+      "output": 168,
+      "context": null,
+      "checked": "2026-11-26",
+      "tags": []
+    },
+    "gpt-5.1": {
+      "provider": "openai",
+      "input": 1.25,
+      "output": 10,
+      "context": null,
+      "checked": "2026-11-26",
+      "tags": []
+    },
+    "gpt-5": {
+      "provider": "openai",
+      "input": 1.25,
+      "output": 10,
+      "context": null,
+      "checked": "2026-11-26",
+      "tags": []
+    },
+    "gpt-5-mini": {
+      "provider": "openai",
+      "input": 0.25,
+      "output": 2,
+      "context": null,
+      "checked": "2026-11-26",
+      "tags": [
+        "cheap"
+      ]
+    },
+    "gpt-5-nano": {
+      "provider": "openai",
+      "input": 0.05,
+      "output": 0.4,
+      "context": null,
+      "checked": "2026-11-26",
+      "tags": [
+        "cheap"
+      ]
+    },
+    "gpt-5-pro": {
+      "provider": "openai",
+      "input": 15,
+      "output": 120,
+      "context": null,
+      "checked": "2026-11-26",
+      "tags": []
+    },
+    "gpt-4.1": {
+      "provider": "openai",
+      "input": 2,
+      "output": 8,
+      "context": null,
+      "checked": "2026-11-26",
+      "tags": []
+    },
+    "gpt-4.1-mini": {
+      "provider": "openai",
+      "input": 0.4,
+      "output": 1.6,
+      "context": null,
+      "checked": "2026-11-26",
+      "tags": []
+    },
+    "gpt-4o": {
+      "provider": "openai",
+      "input": 2.5,
+      "output": 10,
+      "context": null,
+      "checked": "2026-11-26",
+      "tags": []
+    },
+    "gpt-4o-mini": {
+      "provider": "openai",
+      "input": 0.15,
+      "output": 0.6,
+      "context": null,
+      "checked": "2026-11-26",
+      "tags": [
+        "cheap"
+      ]
+    },
+    "o3-pro": {
+      "provider": "openai",
+      "input": 20,
+      "output": 80,
+      "context": null,
+      "checked": "2026-11-26",
+      "tags": [
+        "reasoning"
+      ]
+    },
+    "o3": {
+      "provider": "openai",
+      "input": 2,
+      "output": 8,
+      "context": null,
+      "checked": "2026-11-26",
+      "tags": [
+        "reasoning"
+      ]
+    },
+    "gemini-4-carbon": {
+      "provider": "google",
+      "input": 2,
+      "output": 10,
+      "context": null,
+      "checked": "2026-11-26",
+      "note": "price through 2026-11-30; from 2026-12-01: 4.00 in / 20.00 out",
+      "tags": [
+        "flagship"
+      ]
+    },
+    "gemini-4-argon": {
+      "provider": "google",
+      "input": 2,
+      "output": 10,
+      "context": null,
+      "checked": "2026-11-26",
+      "note": "price through 2026-11-30; from 2026-12-01: 4.00 in / 20.00 out",
+      "tags": []
+    },
+    "gemini-4-neon": {
+      "provider": "google",
+      "input": 3,
+      "output": 15,
+      "context": null,
+      "checked": "2026-11-26",
+      "tags": []
+    },
+    "gemini-4-hydrogen": {
+      "provider": "google",
+      "input": 1.5,
+      "output": 7.5,
+      "context": null,
+      "checked": "2026-11-26",
+      "tags": []
+    },
+    "gemini-3.8-flash": {
+      "provider": "google",
+      "input": 0.75,
+      "output": 3.75,
+      "context": null,
+      "checked": "2026-11-26",
+      "note": "price through 2026-12-31; from 2027-01-01: 1.50 in / 7.50 out",
+      "tags": []
+    },
+    "gemini-3.6-flash": {
+      "provider": "google",
+      "input": 0.75,
+      "output": 3.75,
+      "context": null,
+      "checked": "2026-11-26",
+      "note": "price through 2026-12-31; from 2027-01-01: 1.50 in / 7.50 out",
+      "tags": []
+    },
+    "gemini-3.5-flash-lite": {
+      "provider": "google",
+      "input": 0.3,
+      "output": 2.5,
+      "context": null,
+      "checked": "2026-11-26",
+      "tags": [
+        "cheap"
+      ]
+    },
+    "gemini-3.1-flash-lite": {
+      "provider": "google",
+      "input": 0.25,
+      "output": 1.5,
+      "context": null,
+      "checked": "2026-11-26",
+      "note": "text, image and video input; audio input 0.50",
+      "tags": [
+        "cheap"
+      ]
+    },
+    "gemini-3.1-pro-preview": {
+      "provider": "google",
+      "input": 2,
+      "output": 12,
+      "context": null,
+      "checked": "2026-11-26",
+      "note": "prompts up to 200K tokens; over 200K: 4.00 in / 18.00 out",
+      "tags": []
+    },
+    "gemini-3-flash-preview": {
+      "provider": "google",
+      "input": 0.5,
+      "output": 3,
+      "context": null,
+      "checked": "2026-11-26",
+      "note": "text, image and video input; audio input 1.00",
+      "tags": []
+    },
+    "gemini-2.5-pro": {
+      "provider": "google",
+      "input": 1.25,
+      "output": 10,
+      "context": null,
+      "checked": "2026-11-26",
+      "note": "prompts up to 200K tokens; over 200K: 2.50 in / 15.00 out; page says it is deprecated",
+      "tags": [
+        "legacy"
+      ]
+    },
+    "gemini-2.5-flash": {
+      "provider": "google",
+      "input": 0.3,
+      "output": 2.5,
+      "context": null,
+      "checked": "2026-11-26",
+      "note": "text, image and video input; audio input 1.00; page says it is deprecated",
+      "tags": [
+        "legacy",
+        "cheap"
+      ]
+    },
+    "gemini-2.5-flash-lite": {
+      "provider": "google",
+      "input": 0.1,
+      "output": 0.4,
+      "context": null,
+      "checked": "2026-11-26",
+      "note": "text, image and video input; audio input 0.30",
+      "tags": [
+        "legacy",
+        "cheap"
+      ]
+    },
+    "grok-4.7": {
+      "provider": "xai",
+      "input": 2,
+      "output": 6,
+      "context": 500000,
+      "checked": "2026-11-26",
+      "note": "prompts under 200k tokens; at 200k and over: 4.00 in / 12.00 out",
+      "tags": []
+    },
+    "grok-4.6": {
+      "provider": "xai",
+      "input": 2,
+      "output": 6,
+      "context": 500000,
+      "checked": "2026-11-26",
+      "note": "prompts under 200k tokens; at 200k and over: 4.00 in / 12.00 out",
+      "tags": []
+    },
+    "grok-4.5": {
+      "provider": "xai",
+      "input": 2,
+      "output": 6,
+      "context": 500000,
+      "checked": "2026-11-26",
+      "note": "prompts under 200k tokens; at 200k and over: 4.00 in / 12.00 out",
+      "tags": []
+    },
+    "grok-4.3": {
+      "provider": "xai",
+      "input": 1.25,
+      "output": 2.5,
+      "context": 1000000,
+      "checked": "2026-11-26",
+      "note": "prompts under 200k tokens; at 200k and over: 2.50 in / 5.00 out",
+      "tags": [
+        "long-context"
+      ]
+    },
+    "grok-4.20-0309-reasoning": {
+      "provider": "xai",
+      "input": 1.25,
+      "output": 2.5,
+      "context": 1000000,
+      "checked": "2026-11-26",
+      "note": "prompts under 200k tokens; at 200k and over: 2.50 in / 5.00 out",
+      "tags": [
+        "reasoning",
+        "long-context"
+      ]
+    },
+    "grok-4.20-0309-non-reasoning": {
+      "provider": "xai",
+      "input": 1.25,
+      "output": 2.5,
+      "context": 1000000,
+      "checked": "2026-11-26",
+      "note": "prompts under 200k tokens; at 200k and over: 2.50 in / 5.00 out",
+      "tags": [
+        "long-context"
+      ]
+    },
+    "grok-4.20-multi-agent-0309": {
+      "provider": "xai",
+      "input": 1.25,
+      "output": 2.5,
+      "context": 1000000,
+      "checked": "2026-11-26",
+      "note": "prompts under 200k tokens; at 200k and over: 2.50 in / 5.00 out",
+      "tags": [
+        "long-context"
+      ]
+    },
+    "deepseek-flash": {
+      "provider": "deepseek",
+      "input": 0.15,
+      "output": 0.6,
+      "context": 1000000,
+      "checked": "2026-11-26",
+      "note": "off-peak price; peak hours (01:00-04:00 and 06:00-10:00 UTC, Mon-Fri): 0.30 in / 1.20 out",
+      "tags": [
+        "cheap",
+        "long-context"
+      ]
+    },
+    "deepseek-v4-pro": {
+      "provider": "deepseek",
+      "input": 0.66,
+      "output": 1.98,
+      "context": 1000000,
+      "checked": "2026-11-26",
+      "note": "off-peak price; peak hours (01:00-04:00 and 06:00-10:00 UTC, Mon-Fri): 1.32 in / 3.96 out",
+      "tags": [
+        "long-context"
+      ]
+    },
+    "qwen4-max": {
+      "provider": "alibaba",
+      "input": 1.5,
+      "output": 4.5,
+      "context": 1000000,
+      "checked": "2026-11-26",
+      "note": "international (Singapore) price, input tier 0-1M tokens",
+      "tags": [
+        "long-context"
+      ]
+    },
+    "qwen3.8-max": {
+      "provider": "alibaba",
+      "input": 2,
+      "output": 6,
+      "context": 1000000,
+      "checked": "2026-11-26",
+      "note": "international (Singapore) price, input tier 0-1M tokens",
+      "tags": [
+        "long-context"
+      ]
+    },
+    "qwen3.7-max": {
+      "provider": "alibaba",
+      "input": 2.5,
+      "output": 7.5,
+      "context": 1000000,
+      "checked": "2026-11-26",
+      "note": "international (Singapore) price, input tier 0-1M tokens",
+      "tags": [
+        "long-context"
+      ]
+    },
+    "qwen-max": {
+      "provider": "alibaba",
+      "input": 1.6,
+      "output": 6.4,
+      "context": null,
+      "checked": "2026-11-26",
+      "note": "international (Singapore) price, no tiers",
+      "tags": []
+    },
+    "qwen3.7-plus": {
+      "provider": "alibaba",
+      "input": 0.4,
+      "output": 1.6,
+      "context": 1000000,
+      "checked": "2026-11-26",
+      "note": "international (Singapore) price, input tier 0-256K tokens; 256K-1M: 1.2 in / 4.8 out; page marks it Original price with a limited-time 20% off",
+      "tags": [
+        "long-context"
+      ]
+    },
+    "qwen3.6-plus": {
+      "provider": "alibaba",
+      "input": 0.5,
+      "output": 3,
+      "context": 1000000,
+      "checked": "2026-11-26",
+      "note": "international (Singapore) price, input tier 0-256K tokens; 256K-1M: 2.0 in / 6.0 out",
+      "tags": [
+        "long-context"
+      ]
+    },
+    "qwen3.5-plus": {
+      "provider": "alibaba",
+      "input": 0.4,
+      "output": 2.4,
+      "context": 1000000,
+      "checked": "2026-11-26",
+      "note": "international (Singapore) price, input tier 0-256K tokens; 256K-1M: 0.5 in / 3.0 out",
+      "tags": [
+        "long-context"
+      ]
+    },
+    "qwen-plus": {
+      "provider": "alibaba",
+      "input": 0.4,
+      "output": 1.2,
+      "context": 1000000,
+      "checked": "2026-11-26",
+      "note": "international (Singapore) price, input tier 0-256K tokens, non-thinking output; thinking output 4.0; 256K-1M: 1.2 in / 3.6 out (12 thinking)",
+      "tags": [
+        "long-context"
+      ]
+    },
+    "qwen3.8-flash": {
+      "provider": "alibaba",
+      "input": 0.15,
+      "output": 0.47,
+      "context": 1000000,
+      "checked": "2026-11-26",
+      "note": "international (Singapore) price, input tier 0-1M tokens",
+      "tags": [
+        "cheap",
+        "long-context"
+      ]
+    },
+    "qwen3.7-flash": {
+      "provider": "alibaba",
+      "input": 0.03,
+      "output": 0.13,
+      "context": 1000000,
+      "checked": "2026-11-26",
+      "note": "international (Singapore) price, input tier 0-32K tokens; 32K-256K: 0.1 in / 0.4 out; 256K-1M: 0.2 in / 0.8 out",
+      "tags": [
+        "cheap",
+        "long-context"
+      ]
+    },
+    "qwen3.6-flash": {
+      "provider": "alibaba",
+      "input": 0.25,
+      "output": 1.5,
+      "context": 1000000,
+      "checked": "2026-11-26",
+      "note": "international (Singapore) price, input tier 0-256K tokens; 256K-1M: 1.0 in / 4.0 out",
+      "tags": [
+        "long-context",
+        "cheap"
+      ]
+    },
+    "qwen3.5-flash": {
+      "provider": "alibaba",
+      "input": 0.1,
+      "output": 0.4,
+      "context": 1000000,
+      "checked": "2026-11-26",
+      "note": "international (Singapore) price, input tier 0-1M tokens",
+      "tags": [
+        "cheap",
+        "long-context"
+      ]
+    },
+    "qwen-flash": {
+      "provider": "alibaba",
+      "input": 0.05,
+      "output": 0.4,
+      "context": 1000000,
+      "checked": "2026-11-26",
+      "note": "international (Singapore) price, input tier 0-256K tokens; 256K-1M: 0.25 in / 2.0 out",
+      "tags": [
+        "cheap",
+        "long-context"
+      ]
+    },
+    "llama-4-scout": {
+      "provider": "meta",
+      "input": 0.15,
+      "output": 0.6,
+      "context": 10000000,
+      "checked": "2026-04-22",
+      "tags": [
+        "long-context",
+        "cheap"
+      ]
+    },
+    "llama-4-maverick": {
+      "provider": "meta",
+      "input": 0.15,
+      "output": 0.6,
+      "context": 1000000,
+      "checked": "2026-04-22",
+      "tags": [
+        "long-context",
+        "cheap"
+      ]
+    },
+    "llama-3.3-70b": {
+      "provider": "meta",
+      "input": 0.4,
+      "output": 0.4,
+      "context": 128000,
+      "checked": "2026-04-22",
+      "tags": []
+    },
+    "llama-3.1-70b": {
+      "provider": "meta",
+      "input": 0.4,
+      "output": 0.4,
+      "context": 128000,
+      "checked": "2026-04-22",
+      "tags": []
+    },
+    "llama-3.1-405b": {
+      "provider": "meta",
+      "input": 3.5,
+      "output": 3.5,
+      "context": 128000,
+      "checked": "2026-04-22",
+      "tags": []
+    },
+    "mistral-large-3": {
+      "provider": "mistral",
+      "input": 2,
+      "output": 6,
+      "context": 128000,
+      "checked": "2026-04-22",
+      "tags": []
+    },
+    "mistral-medium-3": {
+      "provider": "mistral",
+      "input": 1,
+      "output": 3,
+      "context": 128000,
+      "checked": "2026-04-22",
+      "tags": []
+    },
+    "mistral-small-4": {
+      "provider": "mistral",
+      "input": 0.15,
+      "output": 0.6,
+      "context": 128000,
+      "checked": "2026-04-22",
+      "tags": [
+        "cheap"
+      ]
+    },
+    "mistral-small-3.1": {
+      "provider": "mistral",
+      "input": 0.2,
+      "output": 0.6,
+      "context": 128000,
+      "checked": "2026-04-22",
+      "tags": [
+        "cheap"
+      ]
+    },
+    "magistral-medium": {
+      "provider": "mistral",
+      "input": 2,
+      "output": 5,
+      "context": 40000,
+      "checked": "2026-04-22",
+      "tags": [
+        "reasoning"
+      ]
+    },
+    "magistral-small-1.2": {
+      "provider": "mistral",
+      "input": 0.5,
+      "output": 1.5,
+      "context": 40000,
+      "checked": "2026-04-22",
+      "tags": [
+        "reasoning"
+      ]
+    },
+    "codestral": {
+      "provider": "mistral",
+      "input": 0.2,
+      "output": 0.6,
+      "context": 32000,
+      "checked": "2026-04-22",
+      "tags": [
+        "coding",
+        "cheap"
+      ]
+    },
+    "mistral-nemo": {
+      "provider": "mistral",
+      "input": 0.02,
+      "output": 0.04,
+      "context": 128000,
+      "checked": "2026-04-22",
+      "tags": [
+        "cheap"
+      ]
+    },
+    "command-a": {
+      "provider": "cohere",
+      "input": 2.5,
+      "output": 10,
+      "context": 256000,
+      "checked": "2026-04-22",
+      "tags": []
+    },
+    "command-r-plus": {
+      "provider": "cohere",
+      "input": 2.5,
+      "output": 10,
+      "context": 128000,
+      "checked": "2026-04-22",
+      "tags": []
+    },
+    "command-r": {
+      "provider": "cohere",
+      "input": 0.15,
+      "output": 0.6,
+      "context": 128000,
+      "checked": "2026-04-22",
+      "tags": [
+        "cheap"
+      ]
+    },
+    "command-r7b": {
+      "provider": "cohere",
+      "input": 0.0375,
+      "output": 0.15,
+      "context": 128000,
+      "checked": "2026-04-22",
+      "tags": [
+        "cheap"
+      ]
+    },
+    "nova-pro": {
+      "provider": "amazon",
+      "input": 0.8,
+      "output": 3.2,
+      "context": 300000,
+      "checked": "2026-04-22",
+      "tags": []
+    },
+    "nova-lite": {
+      "provider": "amazon",
+      "input": 0.06,
+      "output": 0.24,
+      "context": 300000,
+      "checked": "2026-04-22",
+      "tags": [
+        "cheap"
+      ]
+    },
+    "nova-micro": {
+      "provider": "amazon",
+      "input": 0.035,
+      "output": 0.14,
+      "context": 128000,
+      "checked": "2026-04-22",
+      "tags": [
+        "cheap"
+      ]
+    }
+  }
+}

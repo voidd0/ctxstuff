@@ -10,11 +10,8 @@ const fs = require('fs');
 const { packDirectory } = require('../core/packer');
 const { countFilesTokens } = require('../core/tokenizer');
 const { format, FORMATS } = require('../core/formatter');
-const { canOperate, incrementOps, checkFileLimit, checkSizeLimit } = require('../license/limits');
-const { isPro } = require('../license/checker');
-const { maybeShowProTip, showLimitExceeded } = require('../utils/upsell');
 const { colors, success, error, warning, info, header, separator, formatBytes, formatNumber } = require('../utils/output');
-const { DEFAULT_MODEL } = require('../license/constants');
+const { DEFAULT_MODEL } = require('../models');
 
 /**
  * Execute pack command
@@ -34,13 +31,6 @@ async function execute(directory, options = {}) {
     process.exit(1);
   }
 
-  // Check rate limit
-  const opCheck = canOperate();
-  if (!opCheck.allowed) {
-    showLimitExceeded('operations', opCheck.reason);
-    process.exit(1);
-  }
-
   // Pack directory
   const packed = await packDirectory(dir, {
     extensions: options.ext ? options.ext.split(',') : null,
@@ -50,49 +40,11 @@ async function execute(directory, options = {}) {
     includeContent: true,
   });
 
-  // Check file limit
-  const fileCheck = checkFileLimit(packed.files.length);
-  if (!fileCheck.allowed) {
-    showLimitExceeded('files', fileCheck.reason);
-    if (!isPro()) {
-      packed.files = packed.files.slice(0, fileCheck.count);
-      packed.totalFiles = packed.files.length;
-      packed.truncated = true;
-      warning(`Truncated to ${fileCheck.count} files`);
-    }
-  }
-
-  // Check size limit
-  const sizeCheck = checkSizeLimit(packed.totalSize);
-  if (!sizeCheck.allowed) {
-    showLimitExceeded('size', sizeCheck.reason);
-    if (!isPro()) {
-      // Truncate files to fit size limit
-      let currentSize = 0;
-      const limitedFiles = [];
-      for (const file of packed.files) {
-        if (currentSize + file.size <= sizeCheck.size) {
-          limitedFiles.push(file);
-          currentSize += file.size;
-        } else {
-          break;
-        }
-      }
-      packed.files = limitedFiles;
-      packed.totalFiles = packed.files.length;
-      packed.totalSize = currentSize;
-      packed.truncated = true;
-    }
-  }
-
   // Count tokens
   const model = options.model || DEFAULT_MODEL;
   const tokenResult = countFilesTokens(packed.files, model);
   packed.tokens = tokenResult.totalTokens;
   packed.tokensAccurate = tokenResult.accurate;
-
-  // Increment operation count
-  incrementOps();
 
   // Output based on options
   if (options.output) {
@@ -150,9 +102,6 @@ async function execute(directory, options = {}) {
       console.log(formatted);
     }
   }
-
-  // Maybe show PRO tip
-  maybeShowProTip('pack');
 }
 
 /**
@@ -162,24 +111,14 @@ async function execute(directory, options = {}) {
  * @param {Object} options - Options
  */
 function printSummary(packed, model, options) {
-  header(`📦 Packed: ${packed.directory}`);
+  header(`Packed: ${packed.directory}`);
   console.log('');
 
   console.log(`  ${colors.dim('Files:')}     ${formatNumber(packed.totalFiles)}`);
   console.log(`  ${colors.dim('Size:')}      ${formatBytes(packed.totalSize)}`);
 
-  const tokenLabel = packed.tokensAccurate ? 'Tokens:' : 'Tokens:';
-  const tokenNote = packed.tokensAccurate ? '' : colors.dim(' (estimate)');
-  console.log(`  ${colors.dim(tokenLabel)}    ~${formatNumber(packed.tokens)}${tokenNote}`);
-
-  if (!packed.tokensAccurate && !isPro()) {
-    console.log(`  ${colors.dim('')}          ${colors.pro('PRO')} has accurate token counting`);
-  }
-
-  if (packed.truncated) {
-    console.log('');
-    warning('Output was truncated due to FREE tier limits');
-  }
+  const tokenNote = packed.tokensAccurate ? colors.dim(' (tiktoken cl100k_base)') : colors.dim(' (estimate, 1 token per 4 characters)');
+  console.log(`  ${colors.dim('Tokens:')}    ~${formatNumber(packed.tokens)}${tokenNote}`);
 
   if (options.stats) {
     console.log('');

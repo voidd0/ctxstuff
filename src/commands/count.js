@@ -9,11 +9,8 @@ const path = require('path');
 const fs = require('fs');
 const { packDirectory } = require('../core/packer');
 const { countTokens, countFilesTokens, getModelInfo, listModels } = require('../core/tokenizer');
-const { canOperate, incrementOps } = require('../license/limits');
-const { isPro } = require('../license/checker');
-const { maybeShowProTip, showLimitExceeded } = require('../utils/upsell');
 const { colors, success, error, header, separator, formatBytes, formatNumber, table } = require('../utils/output');
-const { DEFAULT_MODEL, MODEL_PRICING } = require('../license/constants');
+const { DEFAULT_MODEL, PRICES_CHECKED } = require('../models');
 
 /**
  * Execute count command
@@ -25,13 +22,6 @@ async function execute(target, options = {}) {
 
   if (!fs.existsSync(targetPath)) {
     error(`Path not found: ${targetPath}`);
-    process.exit(1);
-  }
-
-  // Check rate limit
-  const opCheck = canOperate();
-  if (!opCheck.allowed) {
-    showLimitExceeded('operations', opCheck.reason);
     process.exit(1);
   }
 
@@ -53,12 +43,6 @@ async function execute(target, options = {}) {
     // Count directory
     await countDirectory(targetPath, model, options);
   }
-
-  // Increment operation count
-  incrementOps();
-
-  // Maybe show PRO tip
-  maybeShowProTip('count');
 }
 
 /**
@@ -71,22 +55,17 @@ function countSingleFile(filePath, model, options) {
     const stat = fs.statSync(filePath);
     const modelInfo = getModelInfo(model);
 
-    header(`📊 Token Count: ${path.basename(filePath)}`);
+    header(`Token Count: ${path.basename(filePath)}`);
     console.log('');
 
     console.log(`  ${colors.dim('File:')}     ${filePath}`);
     console.log(`  ${colors.dim('Size:')}     ${formatBytes(stat.size)}`);
     console.log(`  ${colors.dim('Model:')}    ${model}`);
 
-    const tokenLabel = result.accurate ? 'Tokens:' : 'Tokens:';
-    const tokenNote = result.accurate ? colors.dim(' (accurate)') : colors.dim(' (estimate)');
-    console.log(`  ${colors.dim(tokenLabel)}   ${formatNumber(result.tokens)}${tokenNote}`);
+    const tokenNote = result.accurate ? colors.dim(' (tiktoken cl100k_base)') : colors.dim(' (estimate, 1 token per 4 characters)');
+    console.log(`  ${colors.dim('Tokens:')}   ${formatNumber(result.tokens)}${tokenNote}`);
 
-    if (!result.accurate) {
-      console.log(`  ${colors.dim('')}          ${colors.pro('PRO')} has accurate tiktoken counting`);
-    }
-
-    if (modelInfo.known) {
+    if (modelInfo.context) {
       const usage = (result.tokens / modelInfo.context * 100).toFixed(1);
       const remaining = modelInfo.context - result.tokens;
       console.log('');
@@ -121,21 +100,17 @@ async function countDirectory(dir, model, options) {
   const result = countFilesTokens(packed.files, model);
   const modelInfo = getModelInfo(model);
 
-  header(`📊 Token Count: ${packed.directory}`);
+  header(`Token Count: ${packed.directory}`);
   console.log('');
 
   console.log(`  ${colors.dim('Files:')}    ${formatNumber(packed.totalFiles)}`);
   console.log(`  ${colors.dim('Size:')}     ${formatBytes(packed.totalSize)}`);
   console.log(`  ${colors.dim('Model:')}    ${model}`);
 
-  const tokenNote = result.accurate ? colors.dim(' (accurate)') : colors.dim(' (estimate)');
+  const tokenNote = result.accurate ? colors.dim(' (tiktoken cl100k_base)') : colors.dim(' (estimate, 1 token per 4 characters)');
   console.log(`  ${colors.dim('Tokens:')}   ${formatNumber(result.totalTokens)}${tokenNote}`);
 
-  if (!result.accurate) {
-    console.log(`  ${colors.dim('')}          ${colors.pro('PRO')} has accurate tiktoken counting`);
-  }
-
-  if (modelInfo.known) {
+  if (modelInfo.context) {
     const usage = (result.totalTokens / modelInfo.context * 100).toFixed(1);
     const remaining = modelInfo.context - result.totalTokens;
     const fitsContext = result.totalTokens <= modelInfo.context;
@@ -150,7 +125,7 @@ async function countDirectory(dir, model, options) {
     } else {
       console.log(`  ${colors.dim('Overflow:')} ${formatNumber(-remaining)} tokens over`);
       console.log(`  ${colors.error('✗')} Exceeds context window`);
-      console.log(`  ${colors.dim('')}    ${colors.pro('PRO')} can optimize or split to fit`);
+      console.log(`  ${colors.dim('')}    Use optimize or split to fit`);
     }
   }
 
@@ -197,26 +172,26 @@ function printBreakdown(content, model) {
  * Print model list
  */
 function printModelList() {
-  header('📋 Supported Models');
+  header('Models');
   console.log('');
 
   const models = listModels();
 
-  const headers = ['Model', 'Context', 'Input $/1M', 'Output $/1M'];
+  const headers = ['Model', 'Context', 'Input $/1M', 'Output $/1M', 'Checked'];
   const rows = models.map(m => [
     m.name,
-    formatNumber(m.context),
-    m.inputPrice > 0 ? `$${m.inputPrice.toFixed(2)}` : 'free',
-    m.outputPrice > 0 ? `$${m.outputPrice.toFixed(2)}` : 'free',
+    m.context ? formatNumber(m.context) : 'n/a',
+    `$${m.inputPrice}`,
+    `$${m.outputPrice}`,
+    m.checked,
   ]);
 
   table(headers, rows);
 
   console.log('');
+  console.log(colors.dim(`Prices as of ${PRICES_CHECKED}. Rows with an older Checked date were not re-read from the provider page.`));
+  console.log(colors.dim('Context n/a: the pricing page does not state it.'));
   console.log(colors.dim('Use --model <name> to select a model'));
-  if (!isPro()) {
-    console.log(colors.dim(`${colors.pro('PRO')} has custom model profiles with up-to-date pricing`));
-  }
 }
 
 module.exports = { execute };

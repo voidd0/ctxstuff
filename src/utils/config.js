@@ -12,7 +12,7 @@ const CONFIG_FILE = path.join(CONFIG_DIR, 'config.json');
 const PROFILES_FILE = path.join(CONFIG_DIR, 'profiles.json');
 
 const DEFAULT_CONFIG = {
-  defaultModel: 'gpt-5-turbo',
+  defaultModel: 'gpt-5.4',
   defaultFormat: 'markdown',
   showTree: true,
   showTokens: false,

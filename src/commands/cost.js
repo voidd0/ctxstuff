@@ -1,5 +1,5 @@
 /**
- * Cost command (PRO only)
+ * Cost command
  * @module commands/cost
  *
  * Estimates API costs for context
@@ -9,11 +9,12 @@ const path = require('path');
 const fs = require('fs');
 const { packDirectory } = require('../core/packer');
 const { countFilesTokens, calculateCost, listModels, getModelInfo } = require('../core/tokenizer');
-const { isPro } = require('../license/checker');
-const { canOperate, incrementOps } = require('../license/limits');
-const { showProFeatureUpsell, maybeShowProTip } = require('../utils/upsell');
 const { colors, success, error, header, separator, formatBytes, formatNumber, formatMoney, table } = require('../utils/output');
-const { DEFAULT_MODEL, MODEL_PRICING } = require('../license/constants');
+const { MODEL_PRICING, PRICES_CHECKED } = require('../models');
+
+function PRICES_CHECKED_FOR(model) {
+  return MODEL_PRICING[model].checked;
+}
 
 /**
  * Execute cost command
@@ -21,31 +22,10 @@ const { DEFAULT_MODEL, MODEL_PRICING } = require('../license/constants');
  * @param {Object} options - Command options
  */
 async function execute(target, options = {}) {
-  // Check PRO status
-  if (!isPro()) {
-    showProFeatureUpsell('cost', `
-Cost estimation shows you:
-  • Exact API costs before sending
-  • Comparison across models
-  • Input vs output cost breakdown
-  • Save money by choosing optimal model
-
-Stop getting surprised by API bills!
-    `);
-    process.exit(1);
-  }
-
   const targetPath = path.resolve(target || '.');
 
   if (!fs.existsSync(targetPath)) {
     error(`Path not found: ${targetPath}`);
-    process.exit(1);
-  }
-
-  // Check rate limit
-  const opCheck = canOperate();
-  if (!opCheck.allowed) {
-    error(opCheck.reason);
     process.exit(1);
   }
 
@@ -72,9 +52,6 @@ Stop getting surprised by API bills!
     totalSize = packed.totalSize;
   }
 
-  // Increment operation count
-  incrementOps();
-
   if (options.compare || !model) {
     // Compare all models
     printCostComparison(files, outputTokens);
@@ -82,9 +59,6 @@ Stop getting surprised by API bills!
     // Single model cost
     printSingleCost(files, model, outputTokens);
   }
-
-  // Show tip
-  maybeShowProTip('cost');
 }
 
 /**
@@ -99,7 +73,7 @@ function printSingleCost(files, model, outputTokens) {
     process.exit(1);
   }
 
-  header(`💰 Cost Estimate: ${model}`);
+  header(`Cost estimate: ${model}`);
   console.log('');
 
   console.log(`  ${colors.dim('Input tokens:')}   ${formatNumber(tokenResult.totalTokens)}`);
@@ -111,12 +85,18 @@ function printSingleCost(files, model, outputTokens) {
   console.log(`  ${colors.bold('Total cost:')}     ${colors.price(formatMoney(cost.totalCost))}`);
 
   console.log('');
-  console.log(`  ${colors.dim('Context usage:')} ${(cost.contextUsage * 100).toFixed(1)}%`);
-  console.log(`  ${colors.dim('Remaining:')}     ${formatNumber(cost.contextRemaining)} tokens`);
+  const info = getModelInfo(model);
+  if (cost.contextUsage === null) {
+    console.log(`  ${colors.dim('Context:')}       not stated on the provider pricing page`);
+  } else {
+    console.log(`  ${colors.dim('Context usage:')} ${(cost.contextUsage * 100).toFixed(1)}%`);
+    console.log(`  ${colors.dim('Remaining:')}     ${formatNumber(cost.contextRemaining)} tokens`);
+  }
+  console.log(`  ${colors.dim('Price date:')}    ${info.checked}`);
 
-  if (cost.contextUsage > 1) {
+  if (cost.contextUsage !== null && cost.contextUsage > 1) {
     console.log('');
-    console.log(colors.error('⚠ Context limit exceeded! Use optimize or split.'));
+    console.log(colors.error('! Context limit exceeded! Use optimize or split.'));
   }
 }
 
@@ -124,10 +104,10 @@ function printSingleCost(files, model, outputTokens) {
  * Print cost comparison across models
  */
 function printCostComparison(files, outputTokens) {
-  header('💰 Cost Comparison');
+  header('Cost comparison');
   console.log('');
 
-  // Count tokens for each model (they'll be similar for cl100k_base)
+  // Token counts are the same for every model: one tokenizer or estimate is used
   const models = Object.keys(MODEL_PRICING);
   const costs = [];
 
@@ -143,7 +123,8 @@ function printCostComparison(files, outputTokens) {
         outputCost: cost.outputCost,
         totalCost: cost.totalCost,
         contextUsage: cost.contextUsage,
-        fits: cost.contextUsage <= 1,
+        fits: cost.contextUsage === null ? null : cost.contextUsage <= 1,
+        checked: PRICES_CHECKED_FOR(model),
       });
     }
   }
@@ -152,14 +133,15 @@ function printCostComparison(files, outputTokens) {
   costs.sort((a, b) => a.totalCost - b.totalCost);
 
   // Display comparison
-  const headers = ['Model', 'Tokens', 'Input $', 'Output $', 'Total $', 'Fits'];
+  const headers = ['Model', 'Tokens', 'Input $', 'Output $', 'Total $', 'Fits', 'Price date'];
   const rows = costs.map(c => [
     c.model,
     formatNumber(c.inputTokens),
     formatMoney(c.inputCost),
     formatMoney(c.outputCost),
     formatMoney(c.totalCost),
-    c.fits ? colors.success('✓') : colors.error('✗'),
+    c.fits === null ? colors.dim('?') : (c.fits ? colors.success('✓') : colors.error('✗')),
+    c.checked,
   ]);
 
   table(headers, rows);
@@ -167,9 +149,11 @@ function printCostComparison(files, outputTokens) {
   console.log('');
   console.log(colors.dim(`Estimated output: ${formatNumber(outputTokens)} tokens`));
   console.log(colors.dim('Use --output <tokens> to change output estimate'));
+  console.log(colors.dim(`Prices as of ${PRICES_CHECKED}; rows with an older Price date were not re-read from the provider page.`));
+  console.log(colors.dim('Token counts: tiktoken cl100k_base if installed, else 1 token per 4 characters. Same count for every model.'));
 
   // Recommendation
-  const bestFit = costs.find(c => c.fits);
+  const bestFit = costs.find(c => c.fits === true);
   const cheapest = costs[0];
 
   console.log('');
@@ -177,14 +161,14 @@ function printCostComparison(files, outputTokens) {
   console.log('');
 
   if (bestFit) {
-    console.log(colors.success('💡 Recommendation:'));
+    console.log(colors.success('Recommendation:'));
     console.log(`   Best value: ${colors.bold(bestFit.model)} at ${colors.price(formatMoney(bestFit.totalCost))}`);
 
     if (cheapest.model !== bestFit.model) {
       console.log(`   Cheapest (may not fit): ${cheapest.model} at ${formatMoney(cheapest.totalCost)}`);
     }
   } else {
-    console.log(colors.warning('⚠ Content exceeds all model context limits'));
+    console.log(colors.warning('! Content exceeds all model context limits'));
     console.log('   Use optimize or split commands to fit within limits');
   }
 }

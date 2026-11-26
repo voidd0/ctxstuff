@@ -1,14 +1,13 @@
 /**
- * Context optimizer module (PRO feature)
+ * Context optimizer module
  * @module core/optimizer
  *
  * Optimizes packed content to fit within token limits
  * by intelligently prioritizing and truncating content.
  */
 
-const { isPro } = require('../license/checker');
 const { countTokens, getModelInfo } = require('./tokenizer');
-const { DEFAULT_MODEL } = require('../license/constants');
+const { DEFAULT_MODEL } = require('../models');
 
 /**
  * Optimization strategies
@@ -167,19 +166,12 @@ function optimizeFile(file, options = {}) {
 }
 
 /**
- * Optimize packed context to fit token limit (PRO only)
+ * Optimize packed context to fit token limit
  * @param {Object} packed - Packed directory result
  * @param {Object} options - Optimization options
  * @returns {Object} Optimized result
  */
 function optimizeContext(packed, options = {}) {
-  if (!isPro()) {
-    return {
-      error: 'Context optimization is a PRO feature',
-      proRequired: true,
-    };
-  }
-
   const {
     targetTokens = null,
     model = DEFAULT_MODEL,
@@ -190,7 +182,7 @@ function optimizeContext(packed, options = {}) {
   } = options;
 
   const modelInfo = getModelInfo(model);
-  const maxTokens = targetTokens || (modelInfo.known ? modelInfo.context * 0.9 : 100000);
+  const maxTokens = targetTokens || (modelInfo.context ? modelInfo.context * 0.9 : 100000);
 
   // Phase 1: Optimize all files
   const optimizedFiles = packed.files.map(file =>
@@ -269,13 +261,13 @@ function getSuggestions(packed, model = DEFAULT_MODEL) {
 
   const suggestions = [];
 
-  if (modelInfo.known && tokens > modelInfo.context) {
+  if (modelInfo.context && tokens > modelInfo.context) {
     suggestions.push({
       severity: 'error',
       message: `Content (${tokens.toLocaleString()} tokens) exceeds ${model} context (${modelInfo.context.toLocaleString()})`,
       action: 'Run optimize command to fit within limit',
     });
-  } else if (modelInfo.known && tokens > modelInfo.context * 0.9) {
+  } else if (modelInfo.context && tokens > modelInfo.context * 0.9) {
     suggestions.push({
       severity: 'warning',
       message: `Using ${Math.round(tokens / modelInfo.context * 100)}% of ${model} context`,
@@ -296,7 +288,7 @@ function getSuggestions(packed, model = DEFAULT_MODEL) {
   return {
     tokens,
     model,
-    contextLimit: modelInfo.known ? modelInfo.context : null,
+    contextLimit: modelInfo.context || null,
     suggestions,
   };
 }

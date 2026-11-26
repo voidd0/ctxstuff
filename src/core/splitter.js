@@ -1,14 +1,13 @@
 /**
- * Context splitter module (PRO feature)
+ * Context splitter module
  * @module core/splitter
  *
  * Splits large codebases into manageable chunks
  * that fit within model context limits.
  */
 
-const { isPro } = require('../license/checker');
 const { countTokens, getModelInfo, countFilesTokens } = require('./tokenizer');
-const { DEFAULT_MODEL } = require('../license/constants');
+const { DEFAULT_MODEL } = require('../models');
 
 /**
  * Split strategies
@@ -154,19 +153,12 @@ function splitByFiles(files, filesPerChunk) {
 }
 
 /**
- * Split packed context into multiple chunks (PRO only)
+ * Split packed context into multiple chunks
  * @param {Object} packed - Packed directory result
  * @param {Object} options - Split options
  * @returns {Object} Split result with chunks
  */
 function splitContext(packed, options = {}) {
-  if (!isPro()) {
-    return {
-      error: 'Context splitting is a PRO feature',
-      proRequired: true,
-    };
-  }
-
   const {
     strategy = SPLIT_STRATEGIES.BY_TOKENS,
     model = DEFAULT_MODEL,
@@ -182,7 +174,7 @@ function splitContext(packed, options = {}) {
   switch (strategy) {
     case SPLIT_STRATEGIES.BY_TOKENS: {
       const tokenLimit = maxTokensPerChunk ||
-        (modelInfo.known ? Math.floor(modelInfo.context * 0.85) : 50000);
+        (modelInfo.context ? Math.floor(modelInfo.context * 0.85) : 50000);
       chunks = splitByTokens(packed.files, tokenLimit, model);
       break;
     }
@@ -261,7 +253,7 @@ function suggestSplit(packed, model = DEFAULT_MODEL) {
   const tokenResult = countFilesTokens(packed.files, model);
   const { totalTokens } = tokenResult;
 
-  if (!modelInfo.known) {
+  if (!modelInfo.context) {
     return {
       needsSplit: totalTokens > 50000,
       suggestedChunks: Math.ceil(totalTokens / 50000),

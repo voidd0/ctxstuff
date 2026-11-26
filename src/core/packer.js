@@ -6,7 +6,6 @@
 const fs = require('fs');
 const path = require('path');
 const { loadCtxignore } = require('../utils/config');
-const { isPro } = require('../license/checker');
 
 // Default ignore patterns
 const DEFAULT_IGNORE = [
@@ -257,10 +256,8 @@ async function packDirectory(dir, options = {}) {
     ...loadGitignore(dir),
   ];
 
-  // PRO: Add .ctxignore support
-  if (isPro()) {
-    ignorePatterns.push(...loadCtxignore(dir));
-  }
+  // .ctxignore support
+  ignorePatterns.push(...loadCtxignore(dir));
 
   opts.ignorePatterns = ignorePatterns;
 

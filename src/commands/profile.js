@@ -1,15 +1,13 @@
 /**
- * Profile command (PRO only)
+ * Profile command
  * @module commands/profile
  *
  * Manage custom model profiles
  */
 
-const { isPro } = require('../license/checker');
 const { getCustomProfiles, saveCustomProfile, deleteCustomProfile } = require('../utils/config');
-const { showProFeatureUpsell } = require('../utils/upsell');
 const { colors, success, error, warning, header, separator, table } = require('../utils/output');
-const { MODEL_PRICING } = require('../license/constants');
+const { MODEL_PRICING } = require('../models');
 
 /**
  * Execute profile command
@@ -17,20 +15,6 @@ const { MODEL_PRICING } = require('../license/constants');
  * @param {Object} options - Command options
  */
 async function execute(action, options = {}) {
-  // Check PRO status
-  if (!isPro()) {
-    showProFeatureUpsell('profile', `
-Custom model profiles let you:
-  • Add new models with custom pricing
-  • Keep up-to-date with price changes
-  • Configure custom context limits
-  • Save preferred model settings
-
-Stay current with evolving LLM pricing.
-    `);
-    process.exit(1);
-  }
-
   switch (action) {
     case 'list':
     case 'ls':
@@ -65,7 +49,7 @@ Stay current with evolving LLM pricing.
  * List all profiles
  */
 function listProfiles() {
-  header('📋 Model Profiles');
+  header('Model Profiles');
   console.log('');
 
   // Built-in models
@@ -75,9 +59,9 @@ function listProfiles() {
   const builtinHeaders = ['Model', 'Context', 'Input $/1M', 'Output $/1M'];
   const builtinRows = Object.entries(MODEL_PRICING).map(([name, info]) => [
     name,
-    info.context.toLocaleString(),
-    info.input > 0 ? `$${info.input.toFixed(2)}` : 'free',
-    info.output > 0 ? `$${info.output.toFixed(2)}` : 'free',
+    info.context ? info.context.toLocaleString() : 'n/a',
+    `$${info.input}`,
+    `$${info.output}`,
   ]);
 
   table(builtinHeaders, builtinRows);
@@ -96,8 +80,8 @@ function listProfiles() {
       return [
         colors.accent(name),
         p.context.toLocaleString(),
-        p.input > 0 ? `$${p.input.toFixed(2)}` : 'free',
-        p.output > 0 ? `$${p.output.toFixed(2)}` : 'free',
+        `$${p.input}`,
+        `$${p.output}`,
       ];
     });
 
@@ -194,13 +178,16 @@ function showProfile(options) {
 
   const isBuiltin = !!MODEL_PRICING[name] && !customProfiles[name];
 
-  header(`📋 Profile: ${name}`);
+  header(`Profile: ${name}`);
   console.log('');
 
   console.log(`  ${colors.dim('Type:')}      ${isBuiltin ? 'Built-in' : colors.accent('Custom')}`);
-  console.log(`  ${colors.dim('Context:')}   ${profile.context.toLocaleString()} tokens`);
-  console.log(`  ${colors.dim('Input:')}     $${profile.input.toFixed(2)} / 1M tokens`);
-  console.log(`  ${colors.dim('Output:')}    $${profile.output.toFixed(2)} / 1M tokens`);
+  console.log(`  ${colors.dim('Context:')}   ${profile.context ? profile.context.toLocaleString() + ' tokens' : 'not stated on the provider pricing page'}`);
+  console.log(`  ${colors.dim('Input:')}     $${profile.input} / 1M tokens`);
+  console.log(`  ${colors.dim('Output:')}    $${profile.output} / 1M tokens`);
+  if (profile.checked) {
+    console.log(`  ${colors.dim('Price date:')} ${profile.checked}`);
+  }
   console.log(`  ${colors.dim('Tokenizer:')} ${profile.tokenizer || 'cl100k_base'}`);
 
   if (profile.createdAt) {
@@ -221,7 +208,7 @@ function showProfile(options) {
   ];
 
   examples.forEach(ex => {
-    if (ex.tokens <= profile.context) {
+    if (!profile.context || ex.tokens <= profile.context) {
       const inputCost = (ex.tokens / 1_000_000) * profile.input;
       const outputCost = (ex.tokens / 1_000_000) * profile.output;
       console.log(`  ${ex.label}: $${(inputCost + outputCost).toFixed(4)} (in: $${inputCost.toFixed(4)}, out: $${outputCost.toFixed(4)})`);

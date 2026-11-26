@@ -1,9 +1,5 @@
 #!/usr/bin/env node
 
-// ctxstuff — pack codebases into LLM-ready context.
-// 60+ models, cost estimation, optimize/split/watch, all unlocked.
-// Free forever from vøiddo — https://voiddo.com/tools/ctxstuff/
-
 const { Command } = require('commander');
 const pkg = require('../package.json');
 
@@ -11,8 +7,8 @@ const program = new Command();
 
 program
   .name('ctxstuff')
-  .description('Pack codebases into LLM-ready context. Free forever from vøiddo.')
-  .version(`ctxstuff v${pkg.version} — vøiddo, free forever. https://voiddo.com/tools/ctxstuff/`, '-v, --version');
+  .description('Pack a code directory into one context file for LLM prompts, count tokens, split, optimize and estimate cost.')
+  .version(pkg.version, '-v, --version');
 
 // ─── pack ──────────────────────────────────────────────────────────────────
 program
@@ -50,7 +46,7 @@ program
 // ─── compare ───────────────────────────────────────────────────────────────
 program
   .command('compare [target]')
-  .description('Compare token counts across models')
+  .description('Compare token counts and context fit across models')
   .option('-m, --models <models>', 'Models to compare (comma-separated)')
   .option('-e, --ext <extensions>', 'File extensions to include')
   .option('-i, --ignore <patterns>', 'Patterns to ignore')
@@ -103,7 +99,7 @@ program
 // ─── cost ──────────────────────────────────────────────────────────────────
 program
   .command('cost [target]')
-  .description('Estimate API costs across 60+ models')
+  .description('Estimate API costs per model from the price table')
   .option('-m, --model <model>', 'Model for cost calculation')
   .option('-o, --output <tokens>', 'Expected output tokens', '1000')
   .option('-c, --compare', 'Compare costs across models')
@@ -159,11 +155,7 @@ Examples:
   $ ctxstuff cost ./src --compare                 Compare API cost across models
   $ ctxstuff watch ./src -o context.md            Auto-repack on changes
 
-Docs:    https://voiddo.com/tools/ctxstuff/
-Issues:  https://github.com/voidd0/ctxstuff/issues
-Contact: support@voiddo.com
-
-Built by vøiddo — we write tools so you do not have to. Enjoy.
+Docs and issues: https://github.com/voidd0/ctxstuff
 `);
 
 program.parse(process.argv);

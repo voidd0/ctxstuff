@@ -1,135 +1,156 @@
 # ctxstuff
 
-> **Pack codebases into LLM-ready context. Cost-estimate before you send.**
-[![npm](https://img.shields.io/npm/v/@v0idd0/ctxstuff?color=%2322c55e&label=%40v0idd0%2Fctxstuff)](https://www.npmjs.com/package/@v0idd0/ctxstuff)
-[![downloads](https://img.shields.io/npm/dm/@v0idd0/ctxstuff?color=%2322c55e)](https://www.npmjs.com/package/@v0idd0/ctxstuff)
-[![license](https://img.shields.io/npm/l/@v0idd0/ctxstuff?color=%2322c55e)](./LICENSE)
-[![node](https://img.shields.io/node/v/@v0idd0/ctxstuff?color=%2322c55e)](./package.json)
+Packs a code directory into one Markdown, XML, plain or JSON file that you can paste into an LLM prompt. It also counts tokens, compares models, splits or shrinks the pack to a token limit and estimates cost.
 
-**[Homepage](https://tools.voiddo.com/ctxstuff/?ref=ctxstuff-readme)** · **[GitHub](https://github.com/voidd0/ctxstuff)** · **[npm](https://www.npmjs.com/package/@v0idd0/ctxstuff)** · **[All tools](https://tools.voiddo.com/?ref=ctxstuff-catalog-readme)** · **[Contact](mailto:support@voiddo.com)**
-
----
-
-## Why ctxstuff
-
-You have a directory of source code and a frontier LLM with a 200K, 10M-token context window. You need to turn one into prompt material for the other, in a format that the model actually reads well, while knowing **how much this prompt is going to cost** before you pay for it.
-
-Every other tool does half of that, paywalls the other half, and hallucinates pricing numbers that haven't been correct since the day they shipped.
-
-**ctxstuff does the whole job in one binary, 60+ current models, and no artificial limits.** No daily op cap. No 20-file ceiling. No license key. No telemetry. No network calls. You run it locally, it reads your files, it emits markdown/XML/JSON, you paste or pipe, done.
-
-Built because we got tired of manually cat-ing 40 source files into a prompt every time we wanted to ask Claude "does this look right?"
+[![npm](https://img.shields.io/npm/v/@v0idd0/ctxstuff?color=00f6d0&labelColor=050914)](https://www.npmjs.com/package/@v0idd0/ctxstuff)
+[![test](https://github.com/voidd0/ctxstuff/actions/workflows/test.yml/badge.svg)](https://github.com/voidd0/ctxstuff/actions/workflows/test.yml)
+[![license](https://img.shields.io/badge/license-MIT-00f6d0?labelColor=050914)](LICENSE)
 
 ## Install
 
 ```bash
-# npm
 npm install -g @v0idd0/ctxstuff
-
-# or pnpm / yarn / bun
-pnpm add -g @v0idd0/ctxstuff
-yarn global add @v0idd0/ctxstuff
-bun add -g @v0idd0/ctxstuff
-
-# one-shot via npx (no install)
-npx @v0idd0/ctxstuff pack ./src --model claude
 ```
 
-Requires Node.js **≥ 14**.
+Or run it once without installing: `npx @v0idd0/ctxstuff --help`. Needs Node.js 18 or newer. Depends on chalk and commander. The optional packages tiktoken (token counts) and chokidar (the watch command) are installed when available.
 
-## What it does
+## Example
 
-| Command | What it does |
-|---|---|
-| `pack` | Pack a directory into one markdown/XML/plain/JSON context file |
-| `count` | Count tokens in a file or directory, per-file breakdown available |
-| `compare` | Compare token counts and cost across every supported model |
-| `optimize` | Shrink context to fit a target token budget (strip comments, minify, prioritise) |
-| `split` | Split a large codebase into chunks that each fit in one prompt |
-| `cost` | USD cost estimate across 60+ models, sorted cheapest-first |
-| `watch` | Watch a directory and auto-repack on every change (clipboard-aware) |
-| `profile` | Save custom model profiles (context + pricing) for your own tokenizer |
+`demo/app` holds two small files, `README.md` and `src/math.js`. Count its tokens for one model. Output from a real run on 2026-11-26:
+
+```console
+$ ctxstuff count demo/app --model claude-sonnet-5-5
+Token Count: app
+
+  Files:    2
+  Size:     93 B
+  Model:    claude-sonnet-5-5
+  Tokens:   28 (tiktoken cl100k_base)
+
+  Context:  1,000,000 tokens (claude-sonnet-5-5)
+  Usage:    0.0%
+  Remaining: 999,972 tokens
+  ✓ Fits within context window
+```
+
+Compare token counts and context fit for several models:
+
+```console
+$ ctxstuff compare demo/app --models gpt-5.4,claude-sonnet-5-5,grok-4.7,deepseek-flash
+Model comparison: app
+
+  Files:  2
+  Size:   93 B
+
+┌───────────────────┬────────┬───────────┬───────┬──────┐
+│ Model             │ Tokens │ Context   │ Usage │ Fits │
+├───────────────────┼────────┼───────────┼───────┼──────┤
+│ claude-sonnet-5-5 │ 28     │ 1,000,000 │ 0.0%  │ ✓    │
+│ deepseek-flash    │ 28     │ 1,000,000 │ 0.0%  │ ✓    │
+│ grok-4.7          │ 28     │ 500,000   │ 0.0%  │ ✓    │
+│ gpt-5.4           │ 28     │ n/a       │ n/a   │ ?    │
+└───────────────────┴────────┴───────────┴───────┴──────┘
+
+* = estimate (1 token per 4 characters). Without * the count is tiktoken cl100k_base, the same for every model.
+n/a / ?: the provider pricing page does not state the context window.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✓ Fits in 3 model(s):
+  - claude-sonnet-5-5 (999,972 tokens remaining)
+  - deepseek-flash (999,972 tokens remaining)
+  - grok-4.7 (499,972 tokens remaining)
+```
+
+Pack the directory into Markdown on stdout:
+
+```console
+$ ctxstuff pack demo/app --quiet
+# app
+
+**Files:** 2 | **Tokens:** ~28 | **Size:** 93 B
+
+## File Structure
+
+```
+├── README.md
+└── src/
+    └── math.js
+```
+
+## Files
+
+### README.md
+
+```markdown
+# App
+
+A tiny demo project.
+```
+
+### src/math.js
+
+```javascript
+function add(a, b) {
+  return a + b;
+}
+module.exports = { add };
+```
+```
 
 ## Usage
 
-```bash
-# pack a project to a markdown file
-ctxstuff pack ./my-project -o context.md
+```text
+Usage: ctxstuff [options] [command]
 
-# pack as XML and copy straight to clipboard
-ctxstuff pack ./src --format xml -c
+Pack a code directory into one context file for LLM prompts, count tokens,
+split, optimize and estimate cost.
 
-# count tokens across the tree for a specific model
-ctxstuff count ./src --model claude-opus-4-7
+Options:
+  -v, --version                   output the version number
+  -h, --help                      display help for command
 
-# per-file breakdown, heaviest first
-ctxstuff count ./src --breakdown
+Commands:
+  pack [options] [directory]      Pack a directory into a single LLM context
+                                  file
+  count [options] [target]        Count tokens in a file or directory
+  compare [options] [target]      Compare token counts and context fit across
+                                  models
+  optimize [options] [directory]  Optimize context to fit a token limit
+  split [options] [directory]     Split context into chunks
+  cost [options] [target]         Estimate API costs per model from the price
+                                  table
+  watch [options] [directory]     Watch a directory and repack on changes
+  profile [options] [action]      Manage custom model profiles (list, add,
+                                  remove, show)
+  help [command]                  display help for command
 
-# cross-model cost comparison
-ctxstuff cost ./src --compare --output 2000
+Examples:
+  $ ctxstuff pack ./my-project                    Pack a directory into markdown
+  $ ctxstuff pack ./src -o context.md             Pack and save to file
+  $ ctxstuff pack . --format xml -c               Pack as XML, copy to clipboard
+  $ ctxstuff count ./src                          Count tokens across the tree
+  $ ctxstuff count ./src --breakdown              Per-file token breakdown
+  $ ctxstuff compare ./src                        Compare tokens across models
+  $ ctxstuff optimize ./src --tokens 200000       Shrink to fit 200K tokens
+  $ ctxstuff split ./large-repo -o ./chunks       Split into 1M-token chunks
+  $ ctxstuff cost ./src --compare                 Compare API cost across models
+  $ ctxstuff watch ./src -o context.md            Auto-repack on changes
 
-# optimize to fit 500K-token budget
-ctxstuff optimize ./src --tokens 500000 --minify -o optimized.md
-
-# split a huge repo into chunks, each ≤ 1M tokens
-ctxstuff split ./mega-repo --max-tokens 1000000 -o ./chunks
-
-# watch and auto-repack on file save
-ctxstuff watch ./src -o context.md
-
-# see suggested split boundaries without writing anything
-ctxstuff split ./src --suggest
-
-# pick files by extension + ignore node_modules-style junk
-ctxstuff pack . --ext ts,tsx,md --ignore dist,coverage
+Docs and issues: https://github.com/voidd0/ctxstuff
 ```
 
-## Model coverage (60+, pricing snapshot 2026-04-22)
+## Notes on counts and prices
 
-| Provider | Flagship tier | Cheaper tiers |
-|---|---|---|
-| **OpenAI** | `gpt-5.4` ($2.50/$15), `o3` ($2/$8, reasoning) | `gpt-5.4-mini`, `gpt-5.4-nano`, `gpt-5`, `gpt-4.1`, `gpt-4.1-mini`/`nano`, `gpt-4o`, `gpt-4o-mini`, `o3-mini`, `o4-mini` |
-| **Anthropic** | `claude-opus-4-7` ($5/$25, **1M ctx**, released 2026-04-16) | `claude-opus-4-6`, `claude-sonnet-4-6`, `claude-haiku-4-5`, `claude-3.5-sonnet`, `claude-3.5-haiku` |
-| **Google** | `gemini-3.1-pro` ($2/$12, **2M ctx**) | `gemini-3-pro`, `gemini-3-flash`, `gemini-3.1-flash-lite`, `gemini-2.5-pro`, `gemini-2.5-flash` |
-| **Meta** | `llama-4-scout` (**10M ctx!**) | `llama-4-maverick`, `llama-3.3-70b` |
-| **Mistral** | `mistral-large-3` ($2/$6), `magistral-medium` (reasoning) | `mistral-medium-3`, `mistral-small-4`, `magistral-small-1.2`, `codestral` |
-| **xAI** | `grok-4` ($3/$15) | `grok-4.1-fast` (2M ctx, $0.20/$0.50) |
-| **DeepSeek** | `deepseek-v3.2` ($0.28/$0.42), `deepseek-r2` (reasoning) | n/a |
-| **Alibaba** | `qwen3-max` ($0.78/$3.90, 262K ctx) | `qwen3.5-plus` (1M ctx) |
-| **Cohere** | `command-a` ($2.50/$10) | `command-r-plus`, `command-r`, `command-r7b` (**$0.0375**/MTok, cheapest premium) |
+**How tokens are counted.** If the optional `tiktoken` package is installed, ctxstuff counts with its `cl100k_base` encoding. That encoding is used for every model, so the count is the same for all of them and is only a proxy: no model in the table is guaranteed to use it. Without `tiktoken`, ctxstuff estimates one token per 4 characters and marks the number as an estimate. Output says which of the two was used. Neither method is the real tokenizer of a Claude, Gemini, Grok, DeepSeek or Qwen model.
 
-**Short aliases** (pass to `--model`): `gpt`, `claude`, `opus`, `sonnet`, `haiku`, `gemini`, `gemini-pro`, `llama`, `scout`, `maverick`, `mistral`, `magistral`, `grok`, `deepseek`, `qwen`, `command`, `reasoning`. Every old pre-3.0 key (`claude-4-opus`, `mistral-large-2`, etc.) resolves to its 2026-04 equivalent.
-
-Pricing drifts monthly: run `ctxstuff cost . --compare` to see the numbers the installed version knows. Bump the package when you want fresh data.
-
-## Output formats
-
-- **`markdown`** (default), headers per file, fenced code blocks with language hints. Best for Claude, Gemini, GPT-5.
-- **`xml`**: Anthropic's preferred framing (`<file path="..."> ... </file>`). Best for long Claude runs with tool use.
-- **`plain`**: just the raw text, minimal dividers. Best for pipelines that re-process.
-- **`json`**: structured output for programmatic consumers: `{ files: [{ path, lang, content, tokens }], tokens, model }`.
-
-## Library use
-
-```js
-const { pack, count, cost } = require('@v0idd0/ctxstuff');
-
-const result = await pack('./src', {
-  model: 'claude-opus-4-7',
-  format: 'xml',
-  ignore: ['node_modules', 'dist'],
-});
-console.log(result.tokens, result.content.length);
-```
-
-## Contributing
-
-Model gone? Price stale? New provider? New output format? Open an issue at [github.com/voidd0/ctxstuff/issues](https://github.com/voidd0/ctxstuff/issues) or drop a line to [support@voiddo.com](mailto:support@voiddo.com).
+**Prices.** The model table is the file `src/prices.json`. Each entry has the input and output price in USD per 1M tokens and a `checked` date. Entries dated 2026-11-26 were read on that day from the provider pages: [Anthropic](https://platform.claude.com/docs/en/about-claude/pricing), [OpenAI](https://developers.openai.com/api/docs/pricing), [Google](https://aistudio.google.com/docs/pricing), [xAI](https://docs.x.ai/docs/models), [DeepSeek](https://api-docs.deepseek.com/quick_start/pricing) and [Alibaba Cloud](https://www.alibabacloud.com/help/en/model-studio/model-pricing) (international prices). 20 entries for Mistral, Cohere, Amazon Nova and Meta Llama keep their old date of 2026-04-22: they were not refreshed and may be out of date, because the provider pages did not give a clear per-token price list: Mistral's two pages disagreed and stated no unit, Cohere lists only legacy models, the Amazon Nova tables could not be read and Meta lists no per-token prices. Models a provider no longer lists were removed. Where a provider has tiers (long prompts, peak hours, dated price changes) the table holds the base price and the tier is written in the entry's `note`. The table has 99 models. The context window is stored only where the price page states it, otherwise it shows as `n/a`.
 
 ## License
 
-MIT: see [LICENSE](./LICENSE).
+MIT, see [LICENSE](LICENSE).
 
 ---
 
-Maintained by v0idd0.
+Made by [vøiddo](https://voiddo.com/?src=gh). More command line tools: [voiddo.com/packages](https://voiddo.com/packages/?src=gh).
+We also run data scrapers for job boards, shops and ad libraries: [voiddo.com/scrapers](https://voiddo.com/scrapers/?src=gh).

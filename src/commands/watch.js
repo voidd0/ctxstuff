@@ -1,5 +1,5 @@
 /**
- * Watch command (PRO only)
+ * Watch command
  * @module commands/watch
  *
  * Watches files and repacks on changes
@@ -10,10 +10,8 @@ const fs = require('fs');
 const { packDirectory } = require('../core/packer');
 const { countFilesTokens } = require('../core/tokenizer');
 const { format } = require('../core/formatter');
-const { isPro } = require('../license/checker');
-const { showProFeatureUpsell } = require('../utils/upsell');
 const { colors, success, error, info, header, separator, formatBytes, formatNumber } = require('../utils/output');
-const { DEFAULT_MODEL } = require('../license/constants');
+const { DEFAULT_MODEL } = require('../models');
 
 let chokidar = null;
 
@@ -23,20 +21,6 @@ let chokidar = null;
  * @param {Object} options - Command options
  */
 async function execute(directory, options = {}) {
-  // Check PRO status
-  if (!isPro()) {
-    showProFeatureUpsell('watch', `
-File watching automatically:
-  • Repacks context when files change
-  • Updates output file in real-time
-  • Copies to clipboard on change
-  • Shows token count updates
-
-Perfect for iterating while using LLMs.
-    `);
-    process.exit(1);
-  }
-
   // Lazy load chokidar
   try {
     chokidar = require('chokidar');
@@ -56,7 +40,7 @@ Perfect for iterating while using LLMs.
   const outputFile = options.output ? path.resolve(options.output) : null;
   const outputFormat = options.format || 'markdown';
 
-  header(`👁️ Watching: ${path.basename(dir)}`);
+  header(`Watching: ${path.basename(dir)}`);
   console.log('');
   console.log(`  ${colors.dim('Directory:')} ${dir}`);
   console.log(`  ${colors.dim('Model:')}     ${model}`);

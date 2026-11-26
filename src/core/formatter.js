@@ -10,7 +10,6 @@
  * - custom templates
  */
 
-const { isPro } = require('../license/checker');
 
 /**
  * Output formats
@@ -252,16 +251,12 @@ function formatJSON(packed, options = {}) {
 }
 
 /**
- * Format with custom template (PRO only)
+ * Format with custom template
  * @param {Object} packed - Packed directory result
  * @param {string} template - Template string
  * @returns {string} Formatted output
  */
 function formatTemplate(packed, template) {
-  if (!isPro()) {
-    return { error: 'Custom templates are a PRO feature', proRequired: true };
-  }
-
   let output = template;
 
   // Replace placeholders

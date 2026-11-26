@@ -28,9 +28,7 @@ const {
 const { optimizeContext, getSuggestions } = require('./src/core/optimizer');
 const { splitContext, suggestSplit } = require('./src/core/splitter');
 const { format, formatMarkdown, formatXML, formatPlain, formatJSON, FORMATS } = require('./src/core/formatter');
-const { isPro, activateLicense, getLicenseStatus } = require('./src/license/checker');
-const { checkFileLimit, checkSizeLimit, getLimitStatus } = require('./src/license/limits');
-const { MODEL_PRICING, DEFAULT_MODEL, FREE_LIMITS } = require('./src/license/constants');
+const { MODEL_PRICING, DEFAULT_MODEL, PRICES_CHECKED } = require('./src/models');
 
 /**
  * Pack a directory into LLM-ready context
@@ -56,7 +54,7 @@ function count(input, model = DEFAULT_MODEL) {
 }
 
 /**
- * Optimize packed content to fit token limit (PRO only)
+ * Optimize packed content to fit token limit
  * @param {Object} packed - Packed directory result
  * @param {Object} options - Optimization options
  * @returns {Object} Optimized result
@@ -66,7 +64,7 @@ function optimize(packed, options = {}) {
 }
 
 /**
- * Split packed content into chunks (PRO only)
+ * Split packed content into chunks
  * @param {Object} packed - Packed directory result
  * @param {Object} options - Split options
  * @returns {Object} Split result with chunks
@@ -114,17 +112,9 @@ module.exports = {
   formatPlain,
   formatJSON,
 
-  // License
-  isPro,
-  activateLicense,
-  getLicenseStatus,
-  checkFileLimit,
-  checkSizeLimit,
-  getLimitStatus,
-
   // Constants
   MODEL_PRICING,
   DEFAULT_MODEL,
-  FREE_LIMITS,
+  PRICES_CHECKED,
   FORMATS,
 };

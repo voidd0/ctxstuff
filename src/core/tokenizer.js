@@ -2,14 +2,14 @@
  * Token counting module
  * @module core/tokenizer
  *
- * FREE: Uses ~4 chars/token estimate
- * PRO: Uses tiktoken for accurate counts
+ * With the optional `tiktoken` package installed, counts use the cl100k_base
+ * encoding for every model (a proxy: no listed model is guaranteed to use it).
+ * Without it, counts are an estimate of 1 token per 4 characters.
  */
 
-const { isPro } = require('../license/checker');
-const { MODEL_PRICING, DEFAULT_MODEL } = require('../license/constants');
+const { MODEL_PRICING, DEFAULT_MODEL } = require('../models');
 
-// Lazy-load tiktoken for PRO users
+// Lazy-load tiktoken (optional dependency)
 let tiktoken = null;
 let encoderCache = {};
 
@@ -19,8 +19,6 @@ let encoderCache = {};
  * @returns {Object|null} Encoder or null if not available
  */
 function getEncoder(model) {
-  if (!isPro()) return null;
-
   try {
     if (!tiktoken) {
       tiktoken = require('tiktoken');
@@ -41,7 +39,7 @@ function getEncoder(model) {
 }
 
 /**
- * Estimate tokens (FREE version - ~4 chars/token)
+ * Estimate tokens (about 4 characters per token)
  * @param {string} text - Text to count
  * @returns {number} Estimated token count
  */
@@ -53,7 +51,7 @@ function estimateTokens(text) {
 }
 
 /**
- * Count tokens accurately (PRO version with tiktoken)
+ * Count tokens with tiktoken when installed, else estimate
  * @param {string} text - Text to count
  * @param {string} model - Model name
  * @returns {number} Token count
@@ -74,7 +72,7 @@ function countTokensAccurate(text, model = DEFAULT_MODEL) {
 }
 
 /**
- * Count tokens (uses accurate method for PRO, estimate for FREE)
+ * Count tokens (tiktoken cl100k_base when installed, else estimate)
  * @param {string} text - Text to count
  * @param {string} model - Model name
  * @returns {Object} Token info
@@ -84,15 +82,13 @@ function countTokens(text, model = DEFAULT_MODEL) {
     return { tokens: 0, accurate: false };
   }
 
-  if (isPro()) {
-    const encoder = getEncoder(model);
-    if (encoder) {
-      try {
-        const tokens = encoder.encode(text).length;
-        return { tokens, accurate: true, model };
-      } catch (e) {
-        // Fall through to estimate
-      }
+  const encoder = getEncoder(model);
+  if (encoder) {
+    try {
+      const tokens = encoder.encode(text).length;
+      return { tokens, accurate: true, model };
+    } catch (e) {
+      // Fall through to estimate
     }
   }
 
@@ -112,7 +108,7 @@ function countTokens(text, model = DEFAULT_MODEL) {
 function countFilesTokens(files, model = DEFAULT_MODEL) {
   let totalTokens = 0;
   const fileTokens = [];
-  const isAccurate = isPro() && getEncoder(model) !== null;
+  const isAccurate = getEncoder(model) !== null;
 
   for (const file of files) {
     const result = countTokens(file.content || '', model);
@@ -156,6 +152,7 @@ function getModelInfo(model) {
       input: info.input,
       output: info.output,
     },
+    checked: info.checked,
     tokenizer: info.tokenizer,
   };
 }
@@ -183,8 +180,8 @@ function calculateCost(inputTokens, outputTokens = 0, model = DEFAULT_MODEL) {
     inputCost,
     outputCost,
     totalCost: inputCost + outputCost,
-    contextUsage: inputTokens / info.context,
-    contextRemaining: info.context - inputTokens,
+    contextUsage: info.context ? inputTokens / info.context : null,
+    contextRemaining: info.context ? info.context - inputTokens : null,
   };
 }
 
@@ -198,6 +195,7 @@ function listModels() {
     context: info.context,
     inputPrice: info.input,
     outputPrice: info.output,
+    checked: info.checked,
     tokenizer: info.tokenizer,
   }));
 }

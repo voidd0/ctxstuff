@@ -9,11 +9,8 @@ const path = require('path');
 const fs = require('fs');
 const { packDirectory } = require('../core/packer');
 const { countFilesTokens, getModelInfo, listModels } = require('../core/tokenizer');
-const { canOperate, incrementOps } = require('../license/limits');
-const { isPro } = require('../license/checker');
-const { maybeShowProTip } = require('../utils/upsell');
 const { colors, error, header, separator, formatBytes, formatNumber, table } = require('../utils/output');
-const { MODEL_PRICING, DEFAULT_MODEL } = require('../license/constants');
+const { MODEL_PRICING, DEFAULT_MODEL } = require('../models');
 
 /**
  * Execute compare command
@@ -25,13 +22,6 @@ async function execute(target, options = {}) {
 
   if (!fs.existsSync(targetPath)) {
     error(`Path not found: ${targetPath}`);
-    process.exit(1);
-  }
-
-  // Check rate limit
-  const opCheck = canOperate();
-  if (!opCheck.allowed) {
-    error(opCheck.reason);
     process.exit(1);
   }
 
@@ -58,11 +48,8 @@ async function execute(target, options = {}) {
     name = packed.directory;
   }
 
-  // Increment operation count
-  incrementOps();
-
   // Compare models
-  header(`📊 Model Comparison: ${name}`);
+  header(`Model comparison: ${name}`);
   console.log('');
   console.log(`  ${colors.dim('Files:')}  ${formatNumber(files.length)}`);
   console.log(`  ${colors.dim('Size:')}   ${formatBytes(totalSize)}`);
@@ -79,9 +66,9 @@ async function execute(target, options = {}) {
     if (!modelInfo.known) continue;
 
     const tokenResult = countFilesTokens(files, model);
-    const usage = tokenResult.totalTokens / modelInfo.context;
-    const fits = usage <= 1;
-    const remaining = modelInfo.context - tokenResult.totalTokens;
+    const usage = modelInfo.context ? tokenResult.totalTokens / modelInfo.context : null;
+    const fits = usage === null ? null : usage <= 1;
+    const remaining = modelInfo.context ? modelInfo.context - tokenResult.totalTokens : null;
 
     comparisons.push({
       model,
@@ -94,38 +81,37 @@ async function execute(target, options = {}) {
     });
   }
 
-  // Sort by context usage (ascending)
-  comparisons.sort((a, b) => a.usage - b.usage);
+  // Sort by context usage (ascending), models without a known window last
+  comparisons.sort((a, b) => (a.usage ?? Infinity) - (b.usage ?? Infinity));
 
   // Display
   const headers = ['Model', 'Tokens', 'Context', 'Usage', 'Fits'];
   const rows = comparisons.map(c => {
-    const usageStr = `${(c.usage * 100).toFixed(1)}%`;
-    const usageColor = c.usage > 1 ? colors.error : (c.usage > 0.8 ? colors.warning : colors.success);
+    const usageStr = c.usage === null ? 'n/a' : `${(c.usage * 100).toFixed(1)}%`;
+    const usageColor = c.usage === null ? colors.dim : (c.usage > 1 ? colors.error : (c.usage > 0.8 ? colors.warning : colors.success));
 
     return [
       c.model,
       formatNumber(c.tokens) + (c.accurate ? '' : '*'),
-      formatNumber(c.context),
+      c.context ? formatNumber(c.context) : 'n/a',
       usageColor(usageStr),
-      c.fits ? colors.success('✓') : colors.error('✗'),
+      c.fits === null ? colors.dim('?') : (c.fits ? colors.success('✓') : colors.error('✗')),
     ];
   });
 
   table(headers, rows);
 
-  if (!isPro()) {
-    console.log('');
-    console.log(colors.dim('* = estimated tokens (PRO has accurate tiktoken counting)'));
-  }
+  console.log('');
+  console.log(colors.dim('* = estimate (1 token per 4 characters). Without * the count is tiktoken cl100k_base, the same for every model.'));
+  console.log(colors.dim('n/a / ?: the provider pricing page does not state the context window.'));
 
   // Summary
   console.log('');
   separator();
   console.log('');
 
-  const fittingModels = comparisons.filter(c => c.fits);
-  const notFitting = comparisons.filter(c => !c.fits);
+  const fittingModels = comparisons.filter(c => c.fits === true);
+  const notFitting = comparisons.filter(c => c.fits === false);
 
   if (fittingModels.length > 0) {
     console.log(colors.success(`✓ Fits in ${fittingModels.length} model(s):`));
@@ -142,14 +128,9 @@ async function execute(target, options = {}) {
       console.log(`  - ${c.model} (${formatNumber(overflow)} tokens over)`);
     });
 
-    if (!isPro()) {
-      console.log('');
-      console.log(colors.dim(`${colors.pro('PRO')} can optimize or split to fit any model`));
-    }
+    console.log('');
+    console.log(colors.dim('Use optimize or split to fit a smaller model'));
   }
-
-  // Maybe show PRO tip
-  maybeShowProTip('compare');
 }
 
 module.exports = { execute };
